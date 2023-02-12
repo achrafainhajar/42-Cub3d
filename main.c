@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 21:36:11 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/02/11 19:53:31 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/02/12 20:11:17 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,9 +125,9 @@ void	my_mlx_pixel_put(img *data, int x, int y, int color)
 }
 int key_pressed(int key_code,t_vars *vars)
 {
-	if(key_code == S_KEY)
+	if(key_code == W_KEY)
 		vars->player.walkDirection = 1;
-	else if(key_code == W_KEY)
+	else if(key_code == S_KEY)
 		vars->player.walkDirection = -1;
 	else if(key_code == 123)
 		vars->player.turnDirection = 1;
@@ -136,9 +136,10 @@ int key_pressed(int key_code,t_vars *vars)
 }
 int key_release(int key_code,t_vars *vars)
 {
-	if(key_code == S_KEY)
+
+		if(key_code == W_KEY)
 		vars->player.walkDirection = 0;
-	else if(key_code == W_KEY)
+	else if(key_code == S_KEY)
 		vars->player.walkDirection = 0;
 	else if(key_code == 123)
 		vars->player.turnDirection = 0;
@@ -150,10 +151,6 @@ void draw_map(t_vars *vars,int x,int y)
 	if(vars->map[y / 32][x / 32] == '1')
 	{
 		my_mlx_pixel_put(&vars->img,  x, y, 0x00ff00);
-	}
-	if(x / 32 == vars->player.x && y / 32 == vars->player.y)
-	{
-		my_mlx_pixel_put(&vars->img,  x, y, 0xff0000);
 	}
 }
 void draw(t_vars *vars,int x ,int y)
@@ -168,10 +165,6 @@ void draw(t_vars *vars,int x ,int y)
 		j = x;
 		while(j < x + 32)
 		{
-			if(j / 32 == vars->player.x && i / 32 == vars->player.y)
-			{
-				
-			}
 			draw_map(vars,j,i);
 			j++;
 		}
@@ -180,10 +173,10 @@ void draw(t_vars *vars,int x ,int y)
 }
 void draw_line(t_vars *vars)
 {
-	int x1 = (vars->player.x) * 32 + 16;
-    int y1 = (vars->player.y) * 32 + 16;
-    int x2 = ((x1) + cos(vars->player.rotationAngle) * 30);
-    int y2 = ((y1) + sin(vars->player.rotationAngle) * 30);
+	int x1 = (vars->player.x);
+    int y1 = (vars->player.y);
+    int x2 = ((x1) + cos(vars->player.rotationAngle) * 20);
+    int y2 = ((y1) + sin(vars->player.rotationAngle) * 20);
 
     int dx = x2 - x1;
     int dy = y2 - y1;
@@ -210,8 +203,6 @@ void render(t_vars *vars)
 		j = 0;
 		while(j < vars->width * 32)
 		{
-			vars->player.realx = j;
-			vars->player.realy = i;
 			tilex = j * 32;
 			tiley = i * 32;
 			draw(vars,tilex,tiley);
@@ -220,26 +211,66 @@ void render(t_vars *vars)
 		i++;
 	}
 }
+
+void	draw_square(t_vars *vars)
+{
+	// int	x;
+	// int	y;
+
+	// x = (vars->player.x * 32) - 5 / 2;
+	// while (x <	(vars->player.x * 32) + 5 / 2)
+	// {
+	// 	y = (vars->player.y * 32) - 5 / 2;
+	// 	while (y < (vars->player.y * 32) + 5 / 2)
+	// 	{
+	// 		my_mlx_pixel_put(&vars->img, x, y, 0xFFFFFF);
+	// 		y++;
+	// 	}
+	// 	x++;
+	// }
+
+
+ double radius = 0;
+    double i;
+    while(radius < 10)
+    {
+        i = 0;
+        while(i < 360)
+        {
+            my_mlx_pixel_put(&vars->img,(vars->player.x) + cos(i) *radius, (vars->player.y)+ sin(i) * radius,0xffffff);
+            i+=0.5;
+        }
+        radius++;
+    }
+}
 int update(t_vars *vars)
 {
 	vars->img.img = mlx_new_image(vars->mlx, vars->width * 32, vars->height * 32);
 	vars->img.addr = mlx_get_data_addr(vars->img.img, &vars->img.bits_per_pixel, &vars->img.line_length,
 								&vars->img.endian);
-	render(vars);
 	mlx_hook(vars->mlx_win, 2, 1L<<0, key_pressed, vars);
 	if(vars->player.turnDirection)
-		vars->player.rotationAngle +=  vars->player.turnDirection * vars->player.rotationSpeed;
+	{
+		vars->player.rotationAngle += vars->player.turnDirection * vars->player.rotationSpeed;	
+	}
 	if(vars->player.walkDirection)
 	{
-		int movestep = (vars->player.walkDirection * vars->player.moveSpeed);
-		if((vars->player.x + cos(vars->player.rotationAngle) * movestep) < vars->width * 32 
-			&& (vars->player.y + sin(vars->player.rotationAngle) * movestep) < vars->height * 32 )
+		int movestep = vars->player.walkDirection * vars->player.moveSpeed;
+		float x;
+		x = vars->player.x;
+		x  += cos(vars->player.rotationAngle) * movestep;
+		float y;
+		y = vars->player.y;
+		y += sin(vars->player.rotationAngle) * movestep;
+		if(x > 0 && x < vars->width * 32 && y > 0 && y < vars->height * 32 && vars->map[(int)y / 32][ (int)x / 32] != '1')
 		{
-			vars->player.x += cos(vars->player.rotationAngle) * movestep;
-		vars->player.y += sin(vars->player.rotationAngle) * movestep;
+			vars->player.x = x;
+			vars->player.y = y;
 		}
 	}
 	mlx_hook(vars->mlx_win, 3, 1L<<0, key_release, vars);
+	render(vars);
+	draw_square(vars);
 	draw_line(vars);
 	mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img.img, 0, 0);					
 }
@@ -254,8 +285,8 @@ int get_width(char **map)
 }  
 void init_player(t_vars *vars)
 {
-	vars->player.x = vars->width / 2;
-	vars->player.y = vars->height / 2;
+	vars->player.x = (vars->width / 2) * 32 + 16;
+	vars->player.y = (vars->height / 2) * 32 + 16;
 	vars->player.raduis = 3;
 	vars->player.turnDirection = 0;
 	vars->player.walkDirection = 0;

@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 21:41:30 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/02/11 18:50:39 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/02/12 19:56:45 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ typedef struct t_img {
 }				img;
 typedef struct t_player
 {
-    int x;
-    int y;
+    float x;
+    float y;
     int l;
     int realx;
     int realy;
