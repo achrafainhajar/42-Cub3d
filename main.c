@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 21:36:11 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/02/17 09:37:14 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/02/17 22:59:32 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -247,38 +247,6 @@ void	draw_square(t_vars *vars)
         radius++;
     }
 }
-// void cast(int columnid,t_vars *vars , float rayangle)
-// {
-// 	float xintercept;
-// 	float yintercept;
-// 	float ystep;
-// 	float xstep;
-	
-// 	yintercept = floor(vars->player.y / 32) * 32;
-// 	if(rayangle > 0 && rayangle < M_PI)
-// 		yintercept += 32;
-// 	xintercept = vars->player.x + (yintercept - vars->player.y) / tan(rayangle);
-// 	ystep = -32;
-// 	if(rayangle > 0 && rayangle < M_PI)
-// 		ystep *= -1;
-// 	xstep = 32 / tan(rayangle);
-// 	if((rayangle < 0.5 * M_PI || rayangle > 1.5)* M_PI && xstep < 0)
-// 		xstep = xstep * -1;
-// 	if((rayangle >= 0.5 * M_PI || rayangle <= 1.5)* M_PI && xstep > 0)
-// 			xstep = xstep * -1;
-// 	float x;
-// 	float y;
-// 	x = xintercept + xstep;
-// 	y = yintercept + ystep;
-// 	while(vars->map[(int)y / 32][(int)x / 32] != '1')
-// 	{
-// 		x = x + xstep;
-// 		y = y + ystep;
-// 	}
-// 	vars->player.realx = x;
-// 	vars->player.realy = y;
-// 	vars->player.dist = dist(vars->player.x,vars->player.y,x,y,rayangle);
-// }
 float dist(float ax,float ay ,float bx,float by,float ang)
 {
 	return(sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)));
@@ -292,96 +260,178 @@ float normalizeangle(float angle)
 	}
 	return(angle);
 }
-int horizontalcast(int columnid,t_vars *vars , float rayangle)
+// int horizontalcast(int columnid,t_vars *vars , float rayangle)
+// {
+// 	float xintercept;
+// 	float yintercept;
+// 	float ystep;
+// 	float xstep;
+// 	float ntan = -1 / tan(rayangle);
+// 	if(rayangle > M_PI)
+// 	{
+// 		yintercept = (((int) vars->player.y >> 6) << 6) -0.0001;
+// 		xintercept = vars->player.x + (vars->player.y - yintercept) * ntan;
+// 		ystep = -32;
+// 		xstep = -ystep * ntan;
+// 	}
+// 	if(rayangle <  M_PI)
+// 	{
+// 		yintercept = (((int) vars->player.y >> 6) << 6) + 32;
+// 		xintercept = vars->player.x + (vars->player.y - yintercept) * ntan;
+// 		ystep = 32;
+// 		xstep = -ystep * ntan;
+// 	}
+// 	float x;
+// 	float y;
+// 	vars->player.dist = 1000000000;
+// 	x = xintercept + xstep;
+// 	y = yintercept + ystep;
+// 	if(x  < 0 || x  > vars->width * 32 || y > vars->height * 32 || y < 0)
+// 			return(1);
+// 	while(vars->map[(int)y / 32][(int)x / 32] != '1')
+// 	{
+// 		x = x + xstep;
+// 		y = y + ystep;
+// 		if(x  < 0 || x  > vars->width * 32 || y > vars->height * 32 || y < 0)
+// 			return(1);
+// 	}
+// 	vars->player.realx = x;
+// 	vars->player.realy = y;
+// 	vars->player.dist = dist(vars->player.x,vars->player.y,x,y,rayangle);
+// }
+// int verticalcast(int columnid,t_vars *vars , float rayangle)
+// {
+// 	float xintercept;
+// 	float yintercept;
+// 	float ystep;
+// 	float xstep;
+// 	float ntan = -tan(rayangle);
+// 	if(rayangle > P2 && rayangle < P3)
+// 	{
+// 		xintercept = (((int) vars->player.x >> 6) << 6) -0.0001;
+// 		yintercept = vars->player.y + (vars->player.x - xintercept) * ntan;
+// 		xstep = -32;
+// 		ystep = -xstep * ntan;
+// 	}
+// 	if(rayangle <  P2 || rayangle > P3)
+// 	{
+// 		xintercept = (((int) vars->player.x >> 6) << 6) + 32;
+// 		yintercept = vars->player.y + (vars->player.x - xintercept) * ntan;
+// 		xstep = 32;
+// 		ystep = -xstep * ntan;
+// 	}
+// 	float x;
+// 	float y;
+// 	vars->player.ndist =1000000000;
+// 	x = xintercept;
+// 	y = yintercept;
+	
+// 	if(x  < 0 || x  > vars->width * 32 || y > vars->height * 32 || y < 0)
+// 			return(1);
+// 	while(vars->map[(int)(y / 32)][(int)(x / 32)] != '1')
+// 	{
+// 		x = x + xstep;
+// 		y = y + ystep;
+// 		if(x  < 0 || x  > vars->width * 32 || y > vars->height * 32 || y < 0)
+// 			return(1);
+// 	}
+// 	vars->player.nrealx = x;
+// 	vars->player.nrealy = y;
+// 	vars->player.ndist = dist(vars->player.x,vars->player.y,x,y,rayangle);
+// 	return(0);
+// }
+void horizontalcast(int columnid,t_vars *vars , float rayangle)
 {
 	float xintercept;
 	float yintercept;
 	float ystep;
 	float xstep;
-	float ntan = -1 / tan(rayangle);
-	if(rayangle > M_PI)
-	{
-		yintercept = (((int) vars->player.y >> 6) << 6) -0.0001;
-		xintercept = vars->player.x + (vars->player.y - yintercept) * ntan;
-		ystep = -32;
-		xstep = -ystep * ntan;
-	}
-	if(rayangle <  M_PI)
-	{
-		yintercept = (((int) vars->player.y >> 6) << 6) + 32;
-		xintercept = vars->player.x + (vars->player.y - yintercept) * ntan;
-		ystep = 32;
-		xstep = -ystep * ntan;
-	}
+	int l = 0;
+	
+	yintercept = floor(vars->player.y / 32) * 32;
+	if(rayangle > 0 && rayangle < M_PI)// down
+		yintercept += 32;
+	xintercept = vars->player.x + (yintercept - vars->player.y) / tan(rayangle);
+	ystep = 32;
+	if(!(rayangle > 0 && rayangle < M_PI))
+		ystep *= -1;
+	xstep = 32 / tan(rayangle);
+	if((rayangle < 0.5 * M_PI || rayangle > 1.5* M_PI) && xstep < 0) // right
+		xstep = xstep * -1;
+	if(!(rayangle < 0.5 * M_PI || rayangle > 1.5* M_PI) && xstep > 0)
+			xstep = xstep * -1;
 	float x;
 	float y;
-	vars->player.dist = 1000000000;
-	x = xintercept + xstep;
-	y = yintercept + ystep;
-	if(x  < 0 || x  > vars->width * 32 || y > vars->height * 32 || y < 0)
-			return(1);
-	while(vars->map[(int)y / 32][(int)x / 32] != '1')
+	x = xintercept;
+	y = yintercept;
+	if(!(rayangle > 0 && rayangle < M_PI))
+		y--;
+	while(x >= 0 && x <= vars->width * 32 && y >= 0 && y <= vars->height * 32)
 	{
+		if(vars->map[(int)y / 32][(int)x / 32] == '1')
+		{
+			l = 1;
+			break;
+		}
 		x = x + xstep;
 		y = y + ystep;
-		if(x  < 0 || x  > vars->width * 32 || y > vars->height * 32 || y < 0)
-			return(1);
 	}
 	vars->player.realx = x;
 	vars->player.realy = y;
-	vars->player.dist = dist(vars->player.x,vars->player.y,x,y,rayangle);
+		if(l == 1)
+		vars->player.dist = dist(vars->player.x,vars->player.y,x,y,rayangle);
+	else 
+		vars->player.dist = 10000000;
 }
-int verticalcast(int columnid,t_vars *vars , float rayangle)
+void verticalcast(int columnid,t_vars *vars , float rayangle)
 {
 	float xintercept;
 	float yintercept;
+	int l=  0;
 	float ystep;
 	float xstep;
-	float ntan = -tan(rayangle);
-	if(rayangle > P2 && rayangle < P3)
-	{
-		xintercept = (((int) vars->player.x >> 6) << 6) -0.0001;
-		yintercept = vars->player.y + (vars->player.x - xintercept) * ntan;
-		xstep = -32;
-		ystep = -xstep * ntan;
-	}
-	if(rayangle <  P2 || rayangle > P3)
-	{
-		xintercept = (((int) vars->player.x >> 6) << 6) + 32;
-		yintercept = vars->player.y + (vars->player.x - xintercept) * ntan;
-		xstep = 32;
-		ystep = -xstep * ntan;
-	}
+	
+	xintercept = floor(vars->player.x / 32) * 32;
+	if((rayangle < 0.5 * M_PI || rayangle > 1.5* M_PI)) //right
+		xintercept += 32;
+	yintercept = vars->player.y + (xintercept - vars->player.x) * tan(rayangle);
+	xstep = 32;
+	if(!(rayangle < 0.5 * M_PI || rayangle > 1.5* M_PI)) // left
+		xstep *= -1;
+	ystep = 32 * tan(rayangle);
+	if(!(rayangle > 0 && rayangle < M_PI) && ystep > 0)
+		ystep = ystep * -1;
+	if(rayangle > 0 && rayangle < M_PI && ystep < 0)
+		ystep = ystep * -1;
 	float x;
 	float y;
-	vars->player.ndist =1000000000;
 	x = xintercept;
 	y = yintercept;
-	
-	if(x  < 0 || x  > vars->width * 32 || y > vars->height * 32 || y < 0)
-			return(1);
-	while(vars->map[(int)y / 32][(int)x / 32] != '1')
+	if(!(rayangle < 0.5 * M_PI || rayangle > 1.5* M_PI))
+		x--;
+	while(x >= 0 && x <= vars->width * 32 && y >= 0 && y <= vars->height * 32)
 	{
+		if(vars->map[(int)y / 32][(int)x / 32] == '1')
+		{
+			l = 1;
+			break;
+		}
 		x = x + xstep;
 		y = y + ystep;
-		if(x  < 0 || x  > vars->width * 32 || y > vars->height * 32 || y < 0)
-			return(1);
 	}
 	vars->player.nrealx = x;
 	vars->player.nrealy = y;
-	vars->player.ndist = dist(vars->player.x,vars->player.y,x,y,rayangle);
-	return(0);
+	if(l == 1)
+		vars->player.ndist = dist(vars->player.x,vars->player.y,x,y,rayangle);
+	else 
+		vars->player.ndist = 10000000;
 }
 void cast(int columnid,t_vars *vars , float rayangle)
 {
 	horizontalcast(columnid,vars,rayangle);
 	verticalcast(columnid,vars,rayangle);
 	printf( "%ld-%ld\n",vars->player.ndist,vars->player.dist);
-	if(rayangle == 0 || rayangle == M_PI)
-	{
-		draw_line(vars,rayangle,vars->player.x,vars->player.y);
-	}
-	else if((vars->player.dist < vars->player.ndist))
+	if((vars->player.dist < vars->player.ndist))
 		draw_line(vars,rayangle,vars->player.realx,vars->player.realy);
 	else
 		draw_line(vars,rayangle,vars->player.nrealx,vars->player.nrealy);
@@ -392,11 +442,11 @@ void castRays(t_vars *vars)
 	int columnid = 0;
 	float rayangle = vars->player.rotationAngle - (vars->player.fov_angle / 2);
 	int i = 0;
-	while(i < 1)
+	while(i < vars->player.ray_num)
 	{
 		rayangle += vars->player.fov_angle / vars->player.ray_num;
-		//printf("%f\n",vars->player.rotationAngle);
-		cast(columnid,vars,vars->player.rotationAngle);
+		rayangle = normalizeangle(rayangle);
+		cast(columnid,vars,rayangle);
 		columnid++;
 		i++;
 	}
@@ -410,7 +460,6 @@ int update(t_vars *vars)
 	if(vars->player.turnDirection)
 	{
 		vars->player.rotationAngle += vars->player.turnDirection * vars->player.rotationSpeed;
-		vars->player.rotationAngle = normalizeangle(vars->player.rotationAngle);
 	}
 	if(vars->player.walkDirection)
 	{
@@ -449,11 +498,11 @@ void init_player(t_vars *vars)
 	vars->player.raduis = 3;
 	vars->player.turnDirection = 0;
 	vars->player.walkDirection = 0;
-	vars->player.rotationAngle = (M_PI / 2) ;
+	vars->player.rotationAngle = M_PI / 2 ;
 	vars->player.moveSpeed = 2;
 	vars->player.rotationSpeed = 2 * (M_PI/180);
 	vars->player.fov_angle = 60 * (M_PI / 180);
-	vars->player.ray_num = (vars->width) ;
+	vars->player.ray_num = (vars->width * 32);
 }
 int get_height(char **map)
 {
