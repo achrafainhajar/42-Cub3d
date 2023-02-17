@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 21:41:30 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/02/12 19:56:45 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/02/17 07:50:18 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,19 +29,26 @@ typedef struct t_img {
     int endian;
     char  *addr;
 }				img;
+
 typedef struct t_player
 {
     float x;
     float y;
     int l;
-    int realx;
-    int realy;
+    float realx;
+    float nrealx;
+    float nrealy;
+    long ndist;
+    float realy;
     int raduis;
     int turnDirection;
     int walkDirection;
     float rotationAngle;
     int moveSpeed;
     float rotationSpeed;
+    float fov_angle;
+    int ray_num;
+    long dist;
 }               Player;
 typedef struct s_vars {
     void        *mlx;

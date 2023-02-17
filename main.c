@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 21:36:11 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/02/12 20:11:17 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/02/17 09:37:14 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 # include <string.h>
 #include <math.h>
 # include "get_next_line.h"
+#define P2 M_PI/2
+#define P3 3*M_PI/2
 
 char	**ft_splitcpy(const char *s, char c, char **str, int alloc)
 {
@@ -152,6 +154,8 @@ void draw_map(t_vars *vars,int x,int y)
 	{
 		my_mlx_pixel_put(&vars->img,  x, y, 0x00ff00);
 	}
+	else
+		my_mlx_pixel_put(&vars->img,  x, y, 0xCFCFCF);
 }
 void draw(t_vars *vars,int x ,int y)
 {
@@ -171,12 +175,12 @@ void draw(t_vars *vars,int x ,int y)
 		i++;
 	}
 }
-void draw_line(t_vars *vars)
+void draw_line(t_vars *vars,float rayangle,float i ,float j)
 {
 	int x1 = (vars->player.x);
     int y1 = (vars->player.y);
-    int x2 = ((x1) + cos(vars->player.rotationAngle) * 20);
-    int y2 = ((y1) + sin(vars->player.rotationAngle) * 20);
+    int x2 = i;
+    int y2 = j;
 
     int dx = x2 - x1;
     int dy = y2 - y1;
@@ -186,7 +190,7 @@ void draw_line(t_vars *vars)
     float x = x1;
     float y = y1;
     for (int i = 0; i <= steps; i++) {
-        my_mlx_pixel_put(&vars->img, x, y, 0x0000FF);
+        my_mlx_pixel_put(&vars->img, x, y, 0xff00004);
         x += x_inc;
         y += y_inc;
     }
@@ -232,16 +236,170 @@ void	draw_square(t_vars *vars)
 
  double radius = 0;
     double i;
-    while(radius < 10)
+    while(radius < 3)
     {
         i = 0;
         while(i < 360)
         {
-            my_mlx_pixel_put(&vars->img,(vars->player.x) + cos(i) *radius, (vars->player.y)+ sin(i) * radius,0xffffff);
+            my_mlx_pixel_put(&vars->img,(vars->player.x) + cos(i) *radius, (vars->player.y)+ sin(i) * radius,0xFF0000);
             i+=0.5;
         }
         radius++;
     }
+}
+// void cast(int columnid,t_vars *vars , float rayangle)
+// {
+// 	float xintercept;
+// 	float yintercept;
+// 	float ystep;
+// 	float xstep;
+	
+// 	yintercept = floor(vars->player.y / 32) * 32;
+// 	if(rayangle > 0 && rayangle < M_PI)
+// 		yintercept += 32;
+// 	xintercept = vars->player.x + (yintercept - vars->player.y) / tan(rayangle);
+// 	ystep = -32;
+// 	if(rayangle > 0 && rayangle < M_PI)
+// 		ystep *= -1;
+// 	xstep = 32 / tan(rayangle);
+// 	if((rayangle < 0.5 * M_PI || rayangle > 1.5)* M_PI && xstep < 0)
+// 		xstep = xstep * -1;
+// 	if((rayangle >= 0.5 * M_PI || rayangle <= 1.5)* M_PI && xstep > 0)
+// 			xstep = xstep * -1;
+// 	float x;
+// 	float y;
+// 	x = xintercept + xstep;
+// 	y = yintercept + ystep;
+// 	while(vars->map[(int)y / 32][(int)x / 32] != '1')
+// 	{
+// 		x = x + xstep;
+// 		y = y + ystep;
+// 	}
+// 	vars->player.realx = x;
+// 	vars->player.realy = y;
+// 	vars->player.dist = dist(vars->player.x,vars->player.y,x,y,rayangle);
+// }
+float dist(float ax,float ay ,float bx,float by,float ang)
+{
+	return(sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)));
+}
+float normalizeangle(float angle)
+{
+	angle = remainder(angle,2 * M_PI);
+	if(angle < 0)
+	{
+		 angle = (2 * M_PI) + angle;
+	}
+	return(angle);
+}
+int horizontalcast(int columnid,t_vars *vars , float rayangle)
+{
+	float xintercept;
+	float yintercept;
+	float ystep;
+	float xstep;
+	float ntan = -1 / tan(rayangle);
+	if(rayangle > M_PI)
+	{
+		yintercept = (((int) vars->player.y >> 6) << 6) -0.0001;
+		xintercept = vars->player.x + (vars->player.y - yintercept) * ntan;
+		ystep = -32;
+		xstep = -ystep * ntan;
+	}
+	if(rayangle <  M_PI)
+	{
+		yintercept = (((int) vars->player.y >> 6) << 6) + 32;
+		xintercept = vars->player.x + (vars->player.y - yintercept) * ntan;
+		ystep = 32;
+		xstep = -ystep * ntan;
+	}
+	float x;
+	float y;
+	vars->player.dist = 1000000000;
+	x = xintercept + xstep;
+	y = yintercept + ystep;
+	if(x  < 0 || x  > vars->width * 32 || y > vars->height * 32 || y < 0)
+			return(1);
+	while(vars->map[(int)y / 32][(int)x / 32] != '1')
+	{
+		x = x + xstep;
+		y = y + ystep;
+		if(x  < 0 || x  > vars->width * 32 || y > vars->height * 32 || y < 0)
+			return(1);
+	}
+	vars->player.realx = x;
+	vars->player.realy = y;
+	vars->player.dist = dist(vars->player.x,vars->player.y,x,y,rayangle);
+}
+int verticalcast(int columnid,t_vars *vars , float rayangle)
+{
+	float xintercept;
+	float yintercept;
+	float ystep;
+	float xstep;
+	float ntan = -tan(rayangle);
+	if(rayangle > P2 && rayangle < P3)
+	{
+		xintercept = (((int) vars->player.x >> 6) << 6) -0.0001;
+		yintercept = vars->player.y + (vars->player.x - xintercept) * ntan;
+		xstep = -32;
+		ystep = -xstep * ntan;
+	}
+	if(rayangle <  P2 || rayangle > P3)
+	{
+		xintercept = (((int) vars->player.x >> 6) << 6) + 32;
+		yintercept = vars->player.y + (vars->player.x - xintercept) * ntan;
+		xstep = 32;
+		ystep = -xstep * ntan;
+	}
+	float x;
+	float y;
+	vars->player.ndist =1000000000;
+	x = xintercept;
+	y = yintercept;
+	
+	if(x  < 0 || x  > vars->width * 32 || y > vars->height * 32 || y < 0)
+			return(1);
+	while(vars->map[(int)y / 32][(int)x / 32] != '1')
+	{
+		x = x + xstep;
+		y = y + ystep;
+		if(x  < 0 || x  > vars->width * 32 || y > vars->height * 32 || y < 0)
+			return(1);
+	}
+	vars->player.nrealx = x;
+	vars->player.nrealy = y;
+	vars->player.ndist = dist(vars->player.x,vars->player.y,x,y,rayangle);
+	return(0);
+}
+void cast(int columnid,t_vars *vars , float rayangle)
+{
+	horizontalcast(columnid,vars,rayangle);
+	verticalcast(columnid,vars,rayangle);
+	printf( "%ld-%ld\n",vars->player.ndist,vars->player.dist);
+	if(rayangle == 0 || rayangle == M_PI)
+	{
+		draw_line(vars,rayangle,vars->player.x,vars->player.y);
+	}
+	else if((vars->player.dist < vars->player.ndist))
+		draw_line(vars,rayangle,vars->player.realx,vars->player.realy);
+	else
+		draw_line(vars,rayangle,vars->player.nrealx,vars->player.nrealy);
+	
+}
+void castRays(t_vars *vars)
+{
+	int columnid = 0;
+	float rayangle = vars->player.rotationAngle - (vars->player.fov_angle / 2);
+	int i = 0;
+	while(i < 1)
+	{
+		rayangle += vars->player.fov_angle / vars->player.ray_num;
+		//printf("%f\n",vars->player.rotationAngle);
+		cast(columnid,vars,vars->player.rotationAngle);
+		columnid++;
+		i++;
+	}
 }
 int update(t_vars *vars)
 {
@@ -251,7 +409,8 @@ int update(t_vars *vars)
 	mlx_hook(vars->mlx_win, 2, 1L<<0, key_pressed, vars);
 	if(vars->player.turnDirection)
 	{
-		vars->player.rotationAngle += vars->player.turnDirection * vars->player.rotationSpeed;	
+		vars->player.rotationAngle += vars->player.turnDirection * vars->player.rotationSpeed;
+		vars->player.rotationAngle = normalizeangle(vars->player.rotationAngle);
 	}
 	if(vars->player.walkDirection)
 	{
@@ -270,8 +429,8 @@ int update(t_vars *vars)
 	}
 	mlx_hook(vars->mlx_win, 3, 1L<<0, key_release, vars);
 	render(vars);
+	castRays(vars);
 	draw_square(vars);
-	draw_line(vars);
 	mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img.img, 0, 0);					
 }
 int get_width(char **map)
@@ -293,6 +452,8 @@ void init_player(t_vars *vars)
 	vars->player.rotationAngle = (M_PI / 2) ;
 	vars->player.moveSpeed = 2;
 	vars->player.rotationSpeed = 2 * (M_PI/180);
+	vars->player.fov_angle = 60 * (M_PI / 180);
+	vars->player.ray_num = (vars->width) ;
 }
 int get_height(char **map)
 {

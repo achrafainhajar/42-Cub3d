@@ -9,3 +9,4 @@ clean :
 fclean :clean
 
 re : fclean all
+	./cub3d map.ber
