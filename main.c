@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 21:36:11 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/02/19 20:01:02 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/02/19 22:21:38 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -332,7 +332,7 @@ void verticalcast(int columnid,t_vars *vars , float rayangle)
 }
 void render3d(t_vars *vars,int j,float rayangle)
 {
-	int i = 0;
+
 	float raydistance = vars->player.dist  * cos(rayangle - vars->player.rotationAngle);
 	float distprojectionplan = ((vars->width * 32) / 2) / tan(vars->player.fov_angle / 2);
 	int wallstripheight = (32 / raydistance) * distprojectionplan;
@@ -342,7 +342,21 @@ void render3d(t_vars *vars,int j,float rayangle)
 	int wallbot = ((vars->height * 32) / 2) + (wallstripheight / 2);
 	if(wallbot >= vars->height * 32 || wallbot < 0)
 		wallbot  = (vars->height * 32) - 1;
-	int color = 0xff00004 - vars->player.dist;
+	int i = 0;
+	while(i <= ((vars->height * 32) - wallbot))
+	{
+		my_mlx_pixel_put(&vars->img, (vars->width * 32) - (j + 1), i, 0xFF0000);
+		i++;
+	}
+	//i = wallbot;
+	//printf("%d--%d\n",i,vars->height * 32);
+	//while(i < vars->height * 32)
+	//{
+	//	my_mlx_pixel_put(&vars->img, (vars->width * 32) - (j + 1), i, 0xFF0000);
+	//	i++;
+	//}
+	
+	int color = 0x0000FF  / 2;
 	//printf( "%d--%d\n",walltop,wallbot);
 	while(wallbot > walltop)
 	{
