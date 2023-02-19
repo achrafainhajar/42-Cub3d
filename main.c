@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 21:36:11 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/02/19 18:33:14 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/02/19 20:01:02 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,7 +139,7 @@ int key_pressed(int key_code,t_vars *vars)
 int key_release(int key_code,t_vars *vars)
 {
 
-		if(key_code == W_KEY)
+	if(key_code == W_KEY)
 		vars->player.walkDirection = 0;
 	else if(key_code == S_KEY)
 		vars->player.walkDirection = 0;
@@ -330,10 +330,10 @@ void verticalcast(int columnid,t_vars *vars , float rayangle)
 	else 
 		vars->player.ndist = 10000000;
 }
-void render3d(t_vars *vars,int j)
+void render3d(t_vars *vars,int j,float rayangle)
 {
 	int i = 0;
-	float raydistance = vars->player.dist;
+	float raydistance = vars->player.dist  * cos(rayangle - vars->player.rotationAngle);
 	float distprojectionplan = ((vars->width * 32) / 2) / tan(vars->player.fov_angle / 2);
 	int wallstripheight = (32 / raydistance) * distprojectionplan;
 	int walltop = ((vars->height * 32) / 2) - (wallstripheight / 2);
@@ -342,10 +342,11 @@ void render3d(t_vars *vars,int j)
 	int wallbot = ((vars->height * 32) / 2) + (wallstripheight / 2);
 	if(wallbot >= vars->height * 32 || wallbot < 0)
 		wallbot  = (vars->height * 32) - 1;
+	int color = 0xff00004 - vars->player.dist;
 	//printf( "%d--%d\n",walltop,wallbot);
 	while(wallbot > walltop)
 	{
-		my_mlx_pixel_put(&vars->img, (vars->width * 32) - (j + 1), walltop, 0xff00004);
+		my_mlx_pixel_put(&vars->img, (vars->width * 32) - (j + 1), walltop, color);
 		walltop++;
 	}
 }
@@ -375,7 +376,7 @@ void castRays(t_vars *vars)
 		rayangle += vars->player.fov_angle / vars->player.ray_num;
 		rayangle = normalizeangle(rayangle);
 		cast(columnid,vars,rayangle);
-		render3d(vars,i);
+		render3d(vars,i,rayangle);
 		columnid++;
 		i++;
 	}
