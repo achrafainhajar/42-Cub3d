@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 21:36:11 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/02/17 22:59:32 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/02/19 18:33:14 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include <math.h>
 # include "get_next_line.h"
 #define P2 M_PI/2
-#define P3 3*M_PI/2
+#define P3 3 * M_PI/2
 
 char	**ft_splitcpy(const char *s, char c, char **str, int alloc)
 {
@@ -152,10 +152,10 @@ void draw_map(t_vars *vars,int x,int y)
 {
 	if(vars->map[y / 32][x / 32] == '1')
 	{
-		my_mlx_pixel_put(&vars->img,  x, y, 0x00ff00);
+		my_mlx_pixel_put(&vars->img,  scale_factor * x, scale_factor * y, 0x00ff00);
 	}
 	else
-		my_mlx_pixel_put(&vars->img,  x, y, 0xCFCFCF);
+		my_mlx_pixel_put(&vars->img,  scale_factor * x, scale_factor * y, 0xCFCFCF);
 }
 void draw(t_vars *vars,int x ,int y)
 {
@@ -190,7 +190,7 @@ void draw_line(t_vars *vars,float rayangle,float i ,float j)
     float x = x1;
     float y = y1;
     for (int i = 0; i <= steps; i++) {
-        my_mlx_pixel_put(&vars->img, x, y, 0xff00004);
+        my_mlx_pixel_put(&vars->img, scale_factor * x, scale_factor * y, 0xff00004);
         x += x_inc;
         y += y_inc;
     }
@@ -218,22 +218,6 @@ void render(t_vars *vars)
 
 void	draw_square(t_vars *vars)
 {
-	// int	x;
-	// int	y;
-
-	// x = (vars->player.x * 32) - 5 / 2;
-	// while (x <	(vars->player.x * 32) + 5 / 2)
-	// {
-	// 	y = (vars->player.y * 32) - 5 / 2;
-	// 	while (y < (vars->player.y * 32) + 5 / 2)
-	// 	{
-	// 		my_mlx_pixel_put(&vars->img, x, y, 0xFFFFFF);
-	// 		y++;
-	// 	}
-	// 	x++;
-	// }
-
-
  double radius = 0;
     double i;
     while(radius < 3)
@@ -241,7 +225,7 @@ void	draw_square(t_vars *vars)
         i = 0;
         while(i < 360)
         {
-            my_mlx_pixel_put(&vars->img,(vars->player.x) + cos(i) *radius, (vars->player.y)+ sin(i) * radius,0xFF0000);
+            my_mlx_pixel_put(&vars->img,(vars->player.x * scale_factor) + cos(i) *radius, (vars->player.y * scale_factor)+ sin(i) * radius,0xFF0000);
             i+=0.5;
         }
         radius++;
@@ -260,86 +244,6 @@ float normalizeangle(float angle)
 	}
 	return(angle);
 }
-// int horizontalcast(int columnid,t_vars *vars , float rayangle)
-// {
-// 	float xintercept;
-// 	float yintercept;
-// 	float ystep;
-// 	float xstep;
-// 	float ntan = -1 / tan(rayangle);
-// 	if(rayangle > M_PI)
-// 	{
-// 		yintercept = (((int) vars->player.y >> 6) << 6) -0.0001;
-// 		xintercept = vars->player.x + (vars->player.y - yintercept) * ntan;
-// 		ystep = -32;
-// 		xstep = -ystep * ntan;
-// 	}
-// 	if(rayangle <  M_PI)
-// 	{
-// 		yintercept = (((int) vars->player.y >> 6) << 6) + 32;
-// 		xintercept = vars->player.x + (vars->player.y - yintercept) * ntan;
-// 		ystep = 32;
-// 		xstep = -ystep * ntan;
-// 	}
-// 	float x;
-// 	float y;
-// 	vars->player.dist = 1000000000;
-// 	x = xintercept + xstep;
-// 	y = yintercept + ystep;
-// 	if(x  < 0 || x  > vars->width * 32 || y > vars->height * 32 || y < 0)
-// 			return(1);
-// 	while(vars->map[(int)y / 32][(int)x / 32] != '1')
-// 	{
-// 		x = x + xstep;
-// 		y = y + ystep;
-// 		if(x  < 0 || x  > vars->width * 32 || y > vars->height * 32 || y < 0)
-// 			return(1);
-// 	}
-// 	vars->player.realx = x;
-// 	vars->player.realy = y;
-// 	vars->player.dist = dist(vars->player.x,vars->player.y,x,y,rayangle);
-// }
-// int verticalcast(int columnid,t_vars *vars , float rayangle)
-// {
-// 	float xintercept;
-// 	float yintercept;
-// 	float ystep;
-// 	float xstep;
-// 	float ntan = -tan(rayangle);
-// 	if(rayangle > P2 && rayangle < P3)
-// 	{
-// 		xintercept = (((int) vars->player.x >> 6) << 6) -0.0001;
-// 		yintercept = vars->player.y + (vars->player.x - xintercept) * ntan;
-// 		xstep = -32;
-// 		ystep = -xstep * ntan;
-// 	}
-// 	if(rayangle <  P2 || rayangle > P3)
-// 	{
-// 		xintercept = (((int) vars->player.x >> 6) << 6) + 32;
-// 		yintercept = vars->player.y + (vars->player.x - xintercept) * ntan;
-// 		xstep = 32;
-// 		ystep = -xstep * ntan;
-// 	}
-// 	float x;
-// 	float y;
-// 	vars->player.ndist =1000000000;
-// 	x = xintercept;
-// 	y = yintercept;
-	
-// 	if(x  < 0 || x  > vars->width * 32 || y > vars->height * 32 || y < 0)
-// 			return(1);
-// 	while(vars->map[(int)(y / 32)][(int)(x / 32)] != '1')
-// 	{
-// 		x = x + xstep;
-// 		y = y + ystep;
-// 		if(x  < 0 || x  > vars->width * 32 || y > vars->height * 32 || y < 0)
-// 			return(1);
-// 	}
-// 	vars->player.nrealx = x;
-// 	vars->player.nrealy = y;
-// 	vars->player.ndist = dist(vars->player.x,vars->player.y,x,y,rayangle);
-// 	return(0);
-// }
 void horizontalcast(int columnid,t_vars *vars , float rayangle)
 {
 	float xintercept;
@@ -426,15 +330,39 @@ void verticalcast(int columnid,t_vars *vars , float rayangle)
 	else 
 		vars->player.ndist = 10000000;
 }
+void render3d(t_vars *vars,int j)
+{
+	int i = 0;
+	float raydistance = vars->player.dist;
+	float distprojectionplan = ((vars->width * 32) / 2) / tan(vars->player.fov_angle / 2);
+	int wallstripheight = (32 / raydistance) * distprojectionplan;
+	int walltop = ((vars->height * 32) / 2) - (wallstripheight / 2);
+	if(walltop < 0 || walltop >= vars->height * 32)
+		walltop = 0;
+	int wallbot = ((vars->height * 32) / 2) + (wallstripheight / 2);
+	if(wallbot >= vars->height * 32 || wallbot < 0)
+		wallbot  = (vars->height * 32) - 1;
+	//printf( "%d--%d\n",walltop,wallbot);
+	while(wallbot > walltop)
+	{
+		my_mlx_pixel_put(&vars->img, (vars->width * 32) - (j + 1), walltop, 0xff00004);
+		walltop++;
+	}
+}
 void cast(int columnid,t_vars *vars , float rayangle)
 {
 	horizontalcast(columnid,vars,rayangle);
 	verticalcast(columnid,vars,rayangle);
-	printf( "%ld-%ld\n",vars->player.ndist,vars->player.dist);
 	if((vars->player.dist < vars->player.ndist))
-		draw_line(vars,rayangle,vars->player.realx,vars->player.realy);
+	{
+		int l;
+		//draw_line(vars,rayangle,vars->player.realx,vars->player.realy);
+	}
 	else
-		draw_line(vars,rayangle,vars->player.nrealx,vars->player.nrealy);
+	{
+		vars->player.dist = vars->player.ndist;
+		//draw_line(vars,rayangle,vars->player.nrealx,vars->player.nrealy);
+	}
 	
 }
 void castRays(t_vars *vars)
@@ -447,6 +375,7 @@ void castRays(t_vars *vars)
 		rayangle += vars->player.fov_angle / vars->player.ray_num;
 		rayangle = normalizeangle(rayangle);
 		cast(columnid,vars,rayangle);
+		render3d(vars,i);
 		columnid++;
 		i++;
 	}
@@ -477,9 +406,9 @@ int update(t_vars *vars)
 		}
 	}
 	mlx_hook(vars->mlx_win, 3, 1L<<0, key_release, vars);
-	render(vars);
+	//render(vars);
 	castRays(vars);
-	draw_square(vars);
+	//draw_square(vars);
 	mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img.img, 0, 0);					
 }
 int get_width(char **map)

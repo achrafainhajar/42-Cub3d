@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 21:41:30 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/02/17 07:50:18 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/02/18 01:55:07 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@
 # define D_KEY 2
 # define S_KEY 1
 # define W_KEY 13
+# define scale_factor 0.2
+
 typedef struct t_img {
     void *img;
     int bits_per_pixel;
