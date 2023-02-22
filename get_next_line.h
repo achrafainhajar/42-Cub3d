@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 21:41:30 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/02/18 01:55:07 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/02/22 18:36:39 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 # define S_KEY 1
 # define W_KEY 13
 # define scale_factor 0.2
+# define TILE_SIZE 64
 
 typedef struct t_img {
     void *img;
@@ -52,6 +53,13 @@ typedef struct t_player
     int ray_num;
     long dist;
 }               Player;
+typedef struct textures {
+     void *img;
+    int bits_per_pixel;
+    int line_length;
+    int endian;
+    char  *addr;
+}				tex;
 typedef struct s_vars {
     void        *mlx;
     int         width;
@@ -59,6 +67,8 @@ typedef struct s_vars {
     void        *mlx_win;
 	char		**map;
     img         img;
+    int v;
+    tex         wall;
     Player      player;
 }				t_vars;
 char	*get_next_line(int fd);
