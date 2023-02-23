@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 21:41:30 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/02/22 18:36:39 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/02/23 18:46:16 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,8 @@ typedef struct textures {
     int line_length;
     int endian;
     char  *addr;
+    int w;
+    int h;
 }				tex;
 typedef struct s_vars {
     void        *mlx;

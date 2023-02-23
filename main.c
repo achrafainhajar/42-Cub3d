@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 21:36:11 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/02/22 22:36:52 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/02/23 19:03:01 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -365,8 +365,8 @@ void render3d(t_vars *vars,int j,float rayangle)
 	index = walltop;
 	while(wallbot > walltop)
 	{
-		vars->player.nrealy = (index - walltop) * (float)(TILE_SIZE / wallstripheight);
-		my_mlx_pixel_put(&vars->img, (vars->width * TILE_SIZE - 1) - (j), walltop, vars->wall.addr[(int)(TILE_SIZE * vars->player.nrealy + vars->player.nrealx)]);
+		vars->player.nrealy = (walltop - index) * ((float)(vars->wall.h)/ wallstripheight);
+		my_mlx_pixel_put(&vars->img, (vars->width * TILE_SIZE - 1) - (j), walltop, vars->wall.addr[(int)(vars->wall.w * vars->player.nrealy + vars->player.nrealx)]);
 		walltop++;
 	}
 }
@@ -464,7 +464,7 @@ void init_player(t_vars *vars)
 	vars->player.fov_angle = 60 * (M_PI / 180);
 	vars->player.ray_num = (vars->width * TILE_SIZE);
 	vars->wall.img = (unsigned int *)mlx_xpm_file_to_image(vars->mlx,
-			"floor.xpm", &w, &h);
+			"floor.xpm", &vars->wall.w, &vars->wall.h);
 	vars->wall.addr = mlx_get_data_addr(vars->wall.img, &vars->wall.bits_per_pixel,
 			&vars->wall.line_length, &vars->wall.endian);
 	vars->v = 1;
