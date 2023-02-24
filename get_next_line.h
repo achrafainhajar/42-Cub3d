@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 21:41:30 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/02/23 18:46:16 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/02/24 12:12:25 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ typedef struct t_player
     float fov_angle;
     int ray_num;
     long dist;
+    int d;
 }               Player;
 typedef struct textures {
      void *img;
