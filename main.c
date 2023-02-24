@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 21:36:11 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/02/24 12:45:18 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/02/24 12:52:54 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -389,9 +389,11 @@ void render3d(t_vars *vars,int j,float rayangle)
 	else
 		vars->player.nrealx = (int)vars->player.realy % 64;
 	index = walltop;
+	int distft;
 	while(wallbot > walltop)
 	{
-		vars->player.nrealy = (walltop - index) * ((float)(64)/ wallstripheight);
+		distft = walltop + (wallstripheight /2 ) - ((vars->height * 64) / 2);
+		vars->player.nrealy = distft * ((float)(64)/ wallstripheight);
 		my_mlx_pixel_put(&vars->img, (vars->width * TILE_SIZE - 1) - (j), walltop, get_color(vars,(int)vars->player.nrealy,(int)vars->player.nrealx));
 		walltop++;
 	}
