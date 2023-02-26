@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 21:41:30 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/02/24 12:12:25 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/02/26 08:40:27 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 # define D_KEY 2
 # define S_KEY 1
 # define W_KEY 13
-# define scale_factor 0.2
+# define scale_factor 1
 # define TILE_SIZE 64
 
 typedef struct t_img {
@@ -35,21 +35,21 @@ typedef struct t_img {
 
 typedef struct t_player
 {
-    float x;
-    float y;
+    double x;
+    double y;
     int l;
-    float realx;
-    float nrealx;
-    float nrealy;
+    double realx;
+    double nrealx;
+    double nrealy;
     long ndist;
-    float realy;
+    double realy;
     int raduis;
     int turnDirection;
     int walkDirection;
-    float rotationAngle;
-    int moveSpeed;
-    float rotationSpeed;
-    float fov_angle;
+    double rotationAngle;
+    double moveSpeed;
+    double rotationSpeed;
+    double fov_angle;
     int ray_num;
     long dist;
     int d;
@@ -73,6 +73,10 @@ typedef struct s_vars {
     int v;
     tex         wall;
     Player      player;
+    double   tempx;
+    double   tempy;
+    double   temp1x;
+    double   temp1y;
 }				t_vars;
 char	*get_next_line(int fd);
 char	*ft_strjoin(char const *s, char const *s1);
