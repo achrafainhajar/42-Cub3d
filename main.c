@@ -6,14 +6,14 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 21:36:11 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/02/26 14:44:39 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/02/28 08:03:02 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include <mlx.h>
 # include <string.h>
 #include <math.h>
-# include "get_next_line.h"
+# include "cub_3D.h"
 #define P2 M_PI/2
 #define P3 3 * M_PI/2
 
@@ -107,109 +107,7 @@
 //         radius++;
 //     }
 // }
-char	**ft_splitcpy(const char *s, char c, char **str, int alloc)
-{
-	int	i;
-	int	j;
-	int	cnt;
 
-	i = 0;
-	cnt = 0;
-	while (s[i])
-	{
-		j = 0;
-		while (s[i] == c && s[i])
-			i++;
-		while (s[i] != c && s[i])
-		{
-			str[cnt][j] = s[i];
-			i++;
-			j++;
-		}
-		if (cnt < alloc)
-			str[cnt][j] = '\0';
-		cnt++;
-	}
-	if (i != 0 && s[i - 1] == c)
-		cnt--;
-	str[cnt] = NULL;
-	return (str);
-}
-
-char	**ft_charcount(const char *s, char c, char **str, int alloc)
-{
-	int	i;
-	int	j;
-	int	cnt;
-
-	i = 0;
-	j = 0;
-	cnt = 0;
-	while (s[i])
-	{
-		while (s[i] == c && s[i])
-			i++;
-		while (s[i] != c && s[i])
-		{
-			i++;
-			j++;
-		}
-		if (cnt < alloc)
-			str[cnt] = malloc(sizeof(char) * j + 1);
-		if (str == NULL)
-			return (0);
-		j = 0;
-		cnt++;
-	}
-	return (ft_splitcpy(s, c, str, alloc));
-}
-
-char	**ft_split(char const *s, char c)
-{
-	int		i;
-	int		cnt;
-	char	**str;
-
-	if (!s)
-		return (0);
-	i = 0;
-	cnt = 0;
-	while (s[i])
-	{
-		while (s[i] == c && s[i])
-			i++;
-		if (s[i] != c && s[i])
-		{
-			cnt++;
-			while (s[i] != c && s[i])
-				i++;
-		}
-	}
-	str = malloc(sizeof(char *) * (cnt + 1));
-	if (str == NULL)
-		return (0);
-	return (ft_charcount(s, c, str, cnt));
-}
-
-char	*matrix(int fd)
-{
-	char	*str;
-	char	*sret;
-	char	*fr;
-
-	fr = malloc(sizeof(char *) * 5);
-	sret = NULL;
-	str = get_next_line(fd);
-	while (str)
-	{
-		sret = ft_strjoin(sret, str);
-		free(fr);
-		free(str);
-		fr = sret;
-		str = get_next_line(fd);
-	}
-	return (sret);
-}
 void	my_mlx_pixel_put(img *data, int x, int y, int color)
 {
 	char	*dst;
@@ -275,7 +173,10 @@ double normalizeangle(double angle)
 	}
 	return (angle);
 }
-
+unsigned long createRGB(int r, int g, int b)
+{   
+    return ((r & 0xff) << 16) + ((g & 0xff) << 8) + (b & 0xff);
+}
 void	horizontalcast1(t_vars *vars, double rayangle, int l)
 {
 	double	y1;
@@ -284,7 +185,7 @@ void	horizontalcast1(t_vars *vars, double rayangle, int l)
 		&& vars->tempy >= 0 && vars->tempy < vars->height * TILE_SIZE)
 	{
 		y1 = vars->tempy;
-		if (!(rayangle > 0 && rayangle < M_PI))
+		if (!(rayangle > 0 && rayangle < M_PI) && y1 - 1 >= 0)
 			y1--;
 		if (vars->map[(int)floor(y1 / TILE_SIZE)]
 			[(int)floor(vars->tempx / TILE_SIZE)] == '1')
@@ -333,7 +234,7 @@ void verticalcast1(t_vars *vars, double rayangle, int l)
 		&& vars->tempy >= 0 && vars->tempy < vars->height * TILE_SIZE)
 	{
 		x = vars->tempx;
-		if (!(rayangle < 0.5 * M_PI || rayangle > 1.5 * M_PI))
+		if (!(rayangle < 0.5 * M_PI || rayangle > 1.5 * M_PI) && x - 1 >= 0)
 			x--;
 		if (vars->map[(int)floor(vars->tempy / TILE_SIZE)]
 			[(int)floor(x / TILE_SIZE)] == '1')
@@ -374,40 +275,81 @@ void	verticalcast(int columnid, t_vars *vars, double rayangle)
 	verticalcast1(vars, rayangle, l);
 }
 
-int	get_color(t_vars *vars, int y, int x)
+int	get_color(t_vars *vars, int y, int x,double rayangle)
 {
 	char	*pixel;
 	int		color;
-
-	pixel = vars->wall.addr + y * vars->wall.line_length
-		+ x * (vars->wall.bits_per_pixel / 8);
-	color = *((int *) pixel);
+	if(vars->player.l)
+	{
+		if(rayangle > 0 && rayangle < M_PI)
+		{
+			pixel = vars->S.addr + y * vars->S.line_length
+				+ x * (vars->S.bits_per_pixel / 8);
+			color = *((int *) pixel);
+		}
+		else if(!(rayangle > 0 && rayangle < M_PI))
+		{
+			//printf("%f\n",rayangle);
+			pixel = vars->N.addr + y * vars->N.line_length
+				+ x * (vars->N.bits_per_pixel / 8);
+			color = *((int *) pixel);
+		}
+	}
+	else
+	{
+		if(!(rayangle < 0.5 * M_PI || rayangle > 1.5 * M_PI))
+		{
+			pixel = vars->E.addr + y * vars->E.line_length
+				+ x * (vars->E.bits_per_pixel / 8);
+			color = *((int *) pixel);
+		}
+		else
+		{
+			pixel = vars->W.addr + y * vars->W.line_length
+				+ x * (vars->W.bits_per_pixel / 8);
+			color = *((int *) pixel);
+		}
+	}
 	return (color);
 }
 
-void	reder3d1(t_vars *vars, double wallstripheight, int j)
+void	reder3d1(t_vars *vars, double wallstripheight, int j,double rayangle)
 {
 	int	walltop;
 	int	wallbot;
 	int	distft;
-
-	walltop = ((vars->height * TILE_SIZE) / 2) - (wallstripheight / 2);
+	double i = 0;
+	walltop = ((1080) / 2) - (wallstripheight / 2);
 	if (walltop < 0 || walltop >= vars->height * TILE_SIZE)
 		walltop = 0;
-	wallbot = ((vars->height * TILE_SIZE) / 2) + (wallstripheight / 2);
-	if (wallbot >= vars->height * TILE_SIZE || wallbot < 0)
-		wallbot = (vars->height * TILE_SIZE) - 1;
+	wallbot = ((1080) / 2) + (wallstripheight / 2);
+	if (wallbot >= 1080 || wallbot < 0)
+		wallbot = (1080) - 1;
+	
+	while(i <= ((1080) - wallbot))
+	{
+		my_mlx_pixel_put(&vars->img, (1920) - (j + 1), i, vars->c);
+		i++;
+	}
+	i = wallbot;
+	//printf("%d--%d\n",i,vars->height * TILE_SIZE);
+	while(i < 1080)
+	{
+		my_mlx_pixel_put(&vars->img, (1920) - (j + 1), i, vars->f);
+		i++;
+	}
 	if (vars->player.l)
 		vars->player.nrealx = (int)vars->player.realx % 64;
 	else
 		vars->player.nrealx = (int)vars->player.realy % 64;
+		//printf("%f\n",rayangle);
 	while (wallbot > walltop)
 	{
-		distft = walltop + (wallstripheight / 2 ) - ((vars->height * 64) / 2);
+		distft = walltop + (wallstripheight / 2 ) - ((1080) / 2);
 		vars->player.nrealy = distft * ((float)64/ wallstripheight);
-		my_mlx_pixel_put(&vars->img, (vars->width * TILE_SIZE - 1) - (j),
+		my_mlx_pixel_put(&vars->img, (1920 - 1) - (j),
 			walltop, get_color(vars,
-				(int)vars->player.nrealy, (int)vars->player.nrealx));
+				(int)vars->player.nrealy, (int)vars->player.nrealx,rayangle));
 		walltop++;
 	}
 }
@@ -420,15 +362,14 @@ void render3d(t_vars *vars, int j, double rayangle)
 
 	raydistance = vars->player.dist
 		* cos(rayangle - vars->player.rotationAngle);
-	distprojectionplan = ((vars->width * TILE_SIZE) / 2) 
+	distprojectionplan = (1920 / 2) 
 		/ tan(vars->player.fov_angle / 2);
 	wallstripheight = ((int)(TILE_SIZE / raydistance * distprojectionplan));
-	reder3d1(vars, wallstripheight, j);
+	reder3d1(vars, wallstripheight, j,rayangle);
 }
 
 void	cast(int columnid, t_vars *vars , double rayangle)
 {
-	rayangle = normalizeangle(rayangle);
 	horizontalcast(columnid, vars,rayangle);
 	verticalcast(columnid, vars,rayangle);
 	if ((vars->player.dist < vars->player.ndist))
@@ -458,10 +399,31 @@ void castRays(t_vars *vars)
 	while (i < vars->player.ray_num)
 	{
 		rayangle += vars->player.fov_angle / vars->player.ray_num;
+		rayangle = normalizeangle(rayangle);
 		cast(i, vars, rayangle);
 		render3d(vars, i, rayangle);
 		i++;
 	}
+}
+int lol(t_vars *vars,double movestep)
+{
+	double	rayangle;
+	double	x;
+	double	y;
+
+	rayangle = vars->player.rotationAngle += 1
+			* vars->player.rotationSpeed;
+	x = vars->player.x + cos(rayangle) * movestep;
+	y = vars->player.y + sin(rayangle) * movestep;
+	if (vars->map[((int)(y) / TILE_SIZE)][((int)(x) / TILE_SIZE)] == '1')
+		return (1);
+	rayangle = vars->player.rotationAngle += -1
+			* vars->player.rotationSpeed;
+	x = vars->player.x + cos(rayangle) * movestep;
+	y = vars->player.y + sin(rayangle) * movestep;
+	if (vars->map[((int)(y) / TILE_SIZE)][((int)(x) / TILE_SIZE)] == '1')
+		return (1);
+	return(0);
 }
 int walk(t_vars *vars,double movestep,double y,double x)
 {
@@ -477,17 +439,19 @@ int walk(t_vars *vars,double movestep,double y,double x)
 	}
 	if (x >= 0 && x <= vars->width * TILE_SIZE && y >= 0
 		&& y <= vars->height * TILE_SIZE
-		&& vars->map[((int)floor(y/ TILE_SIZE))]
-		[((int)floor(x/ TILE_SIZE))] != '1')
+		&& vars->map[((int)floor(y / TILE_SIZE))]
+		[((int)floor(x / TILE_SIZE))] != '1')
 	{
-		if (vars->map[((int)y / TILE_SIZE)][((int)(x + 10)/ TILE_SIZE)] == '1')
-				x = vars->player.x;
-		else if (vars->map[((int)y / TILE_SIZE)][((int)(x - 10)/ TILE_SIZE)] == '1')
+		//if(lol(vars,movestep))
+		//	return(1);
+		if (vars->map[((int)y / TILE_SIZE)][((int)(x + 2) / TILE_SIZE)] == '1')
 			x = vars->player.x;
-		else if (vars->map[((int)(y + 10) / TILE_SIZE)][((int)x / TILE_SIZE)] == '1')
+		else if (vars->map[((int)y / TILE_SIZE)][((int)(x - 2) / TILE_SIZE)] == '1')
+			x = vars->player.x;
+		else if (vars->map[((int)(y + 2) / TILE_SIZE)][((int)x / TILE_SIZE)] == '1')
 			y = vars->player.y;
-		else if (vars->map[((int)(y - 10) / TILE_SIZE)][((int)x / TILE_SIZE)] == '1')
-				y =vars->player.y;
+		else if (vars->map[((int)(y - 2) / TILE_SIZE)][((int)x / TILE_SIZE)] == '1')
+			y = vars->player.y;
 		vars->player.x = x;
 		vars->player.y = y;
 		vars->v = 1;
@@ -504,14 +468,12 @@ void direction(t_vars *vars)
 	{
 		vars->player.rotationAngle += vars->player.turnDirection
 			* vars->player.rotationSpeed;
-		vars->player.rotationAngle = normalizeangle(vars->player.rotationAngle);
 		vars->v = 1;
 	}
 	if (vars->player.walkDirection)
 	{
 		vars->player.rotationAngle += vars->player.turnDirection
 			* vars->player.rotationSpeed;
-		vars->player.rotationAngle = normalizeangle(vars->player.rotationAngle);
 		movestep = vars->player.walkDirection * vars->player.moveSpeed;
 		y = vars->player.y;
 		x = vars->player.x;
@@ -531,8 +493,7 @@ int	update(t_vars *vars)
 	if (vars->v == 1)
 	{
 		vars->img.img = mlx_new_image(vars->mlx,
-				vars->width * TILE_SIZE,
-				vars->height * TILE_SIZE);
+				1920, 1080);
 		vars->img.addr = mlx_get_data_addr(vars->img.img,
 				&vars->img.bits_per_pixel,
 				&vars->img.line_length, &vars->img.endian);
@@ -544,36 +505,72 @@ int	update(t_vars *vars)
 	}
 }
 
-int	get_width(char **map)
+int	get_width(char	**map)
 {
 	int	i;
+	int	j;
+	int	tmp;
 
 	i = 0;
-	while (map[1][i])
-		i++;
-	return (i);
+	tmp = 0;
+	j = 0;
+	while (map[j])
+	{
+		i = 0;
+		while (map[j][i])
+			i++;
+		if (tmp < i)
+			tmp = i;
+		j++;
+	}
+	return (tmp);
 }
 
-void init_player(t_vars *vars)
+double	get_view(char	a)
+{
+	if ( a == 'N')
+		return (3 * M_PI / 2);
+	else if (a == 'S')
+		return (M_PI / 2);
+	else if (a == 'W')
+		return (M_PI);
+	else if (a == 'E')
+		return (2 * M_PI);
+}
+
+void init_player(t_vars *vars,t_prasing_data *data)
 {
 	int	w;
 	int	h;
 
-	vars->player.x = (vars->width / 2) * TILE_SIZE + 32;
-	vars->player.y = (vars->height / 2) * TILE_SIZE + 32;
 	vars->player.raduis = 3;
 	vars->player.turnDirection = 0;
 	vars->player.walkDirection = 0;
-	vars->player.rotationAngle = M_PI / 2 ;
-	vars->player.moveSpeed = 3;
-	vars->player.rotationSpeed = (M_PI / 180);
+	vars->player.rotationAngle = get_view(data->direction);
+	vars->player.moveSpeed = 10;
+	vars->player.rotationSpeed = 3 * (M_PI / 180);
 	vars->player.fov_angle = 60 * (M_PI / 180);
-	vars->player.ray_num = (vars->width * TILE_SIZE);
-	vars->wall.img = mlx_xpm_file_to_image(vars->mlx,
-			"floor.xpm", &vars->wall.w, &vars->wall.h);
-	vars->wall.addr = mlx_get_data_addr(vars->wall.img,
-			&vars->wall.bits_per_pixel,
-			&vars->wall.line_length, &vars->wall.endian);
+	vars->player.ray_num = (1920);
+	vars->E.img = mlx_xpm_file_to_image(vars->mlx,
+			data->east, &vars->E.w, &vars->E.h);
+	vars->E.addr = mlx_get_data_addr(vars->E.img,
+			&vars->E.bits_per_pixel,
+			&vars->E.line_length, &vars->E.endian);
+		vars->W.img = mlx_xpm_file_to_image(vars->mlx,
+			data->east, &vars->W.w, &vars->W.h);
+	vars->W.addr = mlx_get_data_addr(vars->W.img,
+			&vars->W.bits_per_pixel,
+			&vars->W.line_length, &vars->W.endian);
+		vars->S.img = mlx_xpm_file_to_image(vars->mlx,
+			data->south, &vars->S.w, &vars->S.h);
+	vars->S.addr = mlx_get_data_addr(vars->S.img,
+			&vars->S.bits_per_pixel,
+			&vars->S.line_length, &vars->S.endian);
+		vars->N.img = mlx_xpm_file_to_image(vars->mlx,
+			data->north, &vars->N.w, &vars->N.h);
+	vars->N.addr = mlx_get_data_addr(vars->N.img,
+			&vars->N.bits_per_pixel,
+			&vars->N.line_length, &vars->N.endian);
 	vars->v = 1;
 }
 
@@ -584,26 +581,99 @@ int	get_height(char **map)
 	i = 0;
 	while (map[i])
 		i++;
+	printf("%d\n",i);
 	return (i);
 }
-
-int	main(int argc, char **argv)
+void	get_pos(t_vars *vars,t_prasing_data *data)
 {
-	char	*str;
-	int		fd;
-	t_vars	vars;
+	int	i;
+	int	j;
 
-	fd = open(argv[1], O_RDONLY);
-	str = matrix(fd);
-	vars.map = ft_split(str, '\n');
+	i = -1;
+	while (vars->map[++i])
+	{
+		j = 0;
+		while (vars->map[i][j])
+		{
+			if (vars->map[i][j] == data->direction)
+			{
+				vars->player.x = (j * TILE_SIZE) + 32;
+				vars->player.y = (i * TILE_SIZE) + 32;
+				break ;
+			}
+			j++;
+		}
+	}
+}
+
+int get_rgb(char **str)
+{
+	char **a;
+	a = ft_split(*str,' ');
+	int r = atoi(a[1]);
+	int g = atoi(str[1]);
+	int b = atoi(str[2]);
+	free(a[0]);
+	free(a[1]);
+	free(a);
+	return(createRGB(r,g,b));
+}
+char **editmap(char **map)
+{
+	int l = get_width(map);
+	int i = 0;
+	int j = 0;
+	char **m;
+	
+	m = malloc(sizeof(char *) * (get_height(map) + 1));
+	while(map[j])
+	{
+		i =0;
+		m[j] = malloc(sizeof(char) * l + 1);
+		m[j][l] = 0;
+		while(map[j][i])
+		{
+			m[j][i] = map[j][i];
+			i++;
+		}
+		while(i < l)
+		{
+			m[j][i] = '1';
+			i++;
+		}
+		j++;
+	}
+	m[j] = 0;
+	i = 0;
+	while(m[i])
+	{
+		printf("%s\n",m[i]);
+		i++;
+	}
+	//exit(0);
+	return(m);
+}
+
+int	main(int ac, char **av)
+{
+	t_vars			vars;
+	t_prasing_data	data;
+
+	if (ac != 2 || !type_check(av[1]))
+		print_error("error");
+	parsing(av[1], &data);
+	vars.map = editmap(data.map);
+	vars.ceiling = data.ceiling;
+	vars.f = get_rgb(data.floor);
+	vars.c = get_rgb(data.ceiling);
+	get_pos(&vars, &data);
 	vars.player.d = 0;
 	vars.mlx = mlx_init();
 	vars.height = get_height(vars.map);
 	vars.width = get_width(vars.map);
-	vars.mlx_win = mlx_new_window(vars.mlx, vars.width * TILE_SIZE,
-			vars.height * TILE_SIZE, "Cub3d");
-	init_player(&vars);
+	vars.mlx_win = mlx_new_window(vars.mlx, 1920,
+			1080, "Cub3d");
+	init_player(&vars, &data);
 	mlx_loop_hook(vars.mlx, update, &vars);
 	mlx_loop(vars.mlx);
-	(void) argc;
 }

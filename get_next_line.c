@@ -3,57 +3,93 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mrafik <mrafik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/08 21:40:42 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/02/08 21:40:44 by aainhaja         ###   ########.fr       */
+/*   Created: 2021/12/09 22:58:47 by mrafik            #+#    #+#             */
+/*   Updated: 2023/02/11 14:17:06 by mrafik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "cub_3D.h"
 
-void	extract_line_modify_save(char **save, char **line)
+char	*ft_strjoin1(char *s1, char *s2)
 {
-	char	*temp;
+	char	*p;
+	int		i;
+	int		j;
 
-	*line = ft_substr(*save, 0, (ft_strchr(*save, '\n') + 1));
-	temp = *save;
-	*save = ft_substr(*save, (ft_strchr(*save, '\n') + 1), (ft_strlen(*save)));
-	free(temp);
+	i = 0;
+	j = 0;
+	if (!s1 && !s2)
+		return (NULL);
+	if (!s1)
+		s1 = ft_strdup("");
+	p = (char *)malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
+	if (!p)
+		return (NULL);
+	while (s1[i])
+		p[j++] = s1[i++];
+	i = 0;
+	while (s2[i])
+		p[j++] = s2[i++];
+	p[j] = '\0';
+	free(s1);
+	return (p);
 }
 
-char	*ft_free(char *str)
+int	cont(char *stock)
 {
-	if (str)
-		free(str);
-	str = NULL;
-	return (str);
+	int	i;
+
+	i = 0;
+	while (stock[i] != '\n' && stock[i] != '\0')
+		i++;
+	return (i);
+}
+
+char	*stockline(char *stock, char *buffer, int rd, int fd)
+{
+	while (rd > 0 && !ft_strchr(buffer, '\n'))
+	{
+		rd = read(fd, buffer, 1);
+		if (rd < 0)
+		{
+			free(buffer);
+			return (NULL);
+		}
+		buffer[rd] = '\0';
+		stock = ft_strjoin1(stock, buffer);
+	}
+	free(buffer);
+	if (rd == 0 && stock[0] == '\0')
+	{
+		free(stock);
+		stock = NULL;
+		return (0);
+	}
+	return (stock);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*save;
-	char		buf[30 + 1];
-	char		*line;
-	int			l;
-	char		*temp;
+	int			rd;
+	char		*buffer;
+	static char	*stock;
+	int			i;
+	char		*tmp;
 
-	while (ft_strchr(save, '\n') == -1)
-	{
-		l = read(fd, buf, 30);
-		if (l == 0 || l == -1)
-		{
-			if ((save && save[0] == '\0'))
-				return (ft_free(save));
-			temp = save;
-			save = NULL;
-			return (temp);
-		}
-		buf[l] = '\0';
-		temp = save;
-		save = ft_strjoin(save, buf);
-		ft_free(temp);
-	}
-	extract_line_modify_save(&save, &line);
-	return (line);
+	rd = 1;
+	if (fd < 0)
+		return (0);
+	buffer = (char *) malloc(1 + 1);
+	buffer[0] = 0;
+	stock = stockline(stock, buffer, rd, fd);
+	if (!stock)
+		return (NULL);
+	i = cont(stock);
+	buffer = ft_substr(stock, 0, i + 1);
+	tmp = stock;
+	stock = ft_substr(stock, i + 1, ft_strlen(stock));
+	free(tmp);
+	return (buffer);
 }

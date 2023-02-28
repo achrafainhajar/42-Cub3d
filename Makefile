@@ -1,12 +1,25 @@
-SRC = main.c get_next_line.c get_next_line_utils.c
-CC = gcc 
-NAME = cub3d
+NAME	=	cub_3D
+
+SRCS	=	ft_isdigit.c ft_isalpha.c ft_atoi.c ft_split.c ft_strrchr.c ft_strjoin.c tstt.c get_next_line_utils.c get_next_line.c  parsing.c parsing_hlp.c parsing_hlp1.c parsing_hlp2.c parsing_hlp3.c main.c
+
+OBJCT	=	${SRCS:.c=.o}
+
+RM		=	rm -f
+
+CC		=	gcc  #-fsanitize=address -g
+
 all : $(NAME)
-$(NAME):$(SRC)
-	$(CC) $(SRC) -lmlx -framework OpenGL -framework AppKit -o  $(NAME)
+
+all : $(NAME)
+$(NAME):$(SRCS)
+	$(CC) $(SRCS) -lmlx -framework OpenGL -framework AppKit -o  $(NAME)
+
 clean :
-	rm -rf $(NAME)
-fclean :clean
+	${RM} ${OBJCT}
+
+fclean : clean
+	${RM} ${NAME}
 
 re : fclean all
-	./cub3d map.ber
+
+.PHONY:		all clean fclean re 
