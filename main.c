@@ -6,16 +6,10 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 21:36:11 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/02/28 08:03:02 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/02/28 23:51:19 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include <mlx.h>
-# include <string.h>
-#include <math.h>
-# include "cub_3D.h"
-#define P2 M_PI/2
-#define P3 3 * M_PI/2
 
 // void	my_mlx_pixel_put(img *data, int x, int y, int color);
 // void draw_map(t_vars *vars,int x,int y)
@@ -107,64 +101,72 @@
 //         radius++;
 //     }
 // }
+#include<mlx.h>
+#include<string.h>
+#include<math.h>
+#include"cub_3D.h"
 
-void	my_mlx_pixel_put(img *data, int x, int y, int color)
+void	my_mlx_pixel_put(t_img *data, int x, int y, int color)
 {
 	char	*dst;
 
 	dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
 	*(unsigned int *)dst = color;
 }
-int key_pressed(int key_code,t_vars *vars)
+
+int	key_pressed(int key_code, t_vars *vars)
 {
 	if (key_code == W_KEY)
-		vars->player.walkDirection = 1;
+		vars->player.walkdirection = 1;
 	else if (key_code == S_KEY)
-		vars->player.walkDirection = -1;
+		vars->player.walkdirection = -1;
 	else if (key_code == 123)
-		vars->player.turnDirection = 1;
+		vars->player.turndirection = 1;
 	else if (key_code == 124)
-		vars->player.turnDirection = -1;
+		vars->player.turndirection = -1;
 	else if (key_code == 2)
 	{
 		vars->player.d = 2;
-		vars->player.walkDirection = -1;
+		vars->player.walkdirection = -1;
 	}
 	else if (key_code == 0)
 	{
 		vars->player.d = 2;
-		vars->player.walkDirection = 1;
+		vars->player.walkdirection = 1;
 	}
+	else if (key_code == 53)
+		exit(0);
+	return (1);
 }
 
-int	key_release(int	key_code,t_vars	*vars)
+int	key_release(int key_code, t_vars	*vars)
 {
 	if (key_code == W_KEY)
-		vars->player.walkDirection = 0;
+		vars->player.walkdirection = 0;
 	else if (key_code == S_KEY)
-		vars->player.walkDirection = 0;
+		vars->player.walkdirection = 0;
 	else if (key_code == 123)
-		vars->player.turnDirection = 0;
+		vars->player.turndirection = 0;
 	else if (key_code == 124)
-		vars->player.turnDirection = 0;
+		vars->player.turndirection = 0;
 	else if (key_code == 2)
 	{
 		vars->player.d = 0;
-		vars->player.walkDirection = 0;
+		vars->player.walkdirection = 0;
 	}
 	else if (key_code == 0)
 	{
 		vars->player.d = 0;
-		vars->player.walkDirection = 0;
+		vars->player.walkdirection = 0;
 	}
 }
 
-double	dist(double ax,double ay ,double bx,double by,double ang)
+double	dist(double ax, double ay, double bx, double by, double ang)
 {
 	return (sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)));
 }
 
-double normalizeangle(double angle)
+double	normalizeangle(double angle)
 {
 	angle = remainder(angle, 2 * M_PI);
 	if (angle <= 0)
@@ -173,10 +175,12 @@ double normalizeangle(double angle)
 	}
 	return (angle);
 }
-unsigned long createRGB(int r, int g, int b)
-{   
-    return ((r & 0xff) << 16) + ((g & 0xff) << 8) + (b & 0xff);
+
+unsigned long	createRGB(int r, int g, int b)
+{
+	return (((r & 0xff) << 16) + ((g & 0xff) << 8) + (b & 0xff));
 }
+
 void	horizontalcast1(t_vars *vars, double rayangle, int l)
 {
 	double	y1;
@@ -203,27 +207,6 @@ void	horizontalcast1(t_vars *vars, double rayangle, int l)
 				vars->tempx, vars->tempy, rayangle);
 	else
 		vars->player.dist = 10000000;
-}
-
-void horizontalcast(int columnid, t_vars *vars, double rayangle)
-{
-	int	l;
-
-	l = 0;
-	vars->tempy = floor(vars->player.y / TILE_SIZE) * TILE_SIZE;
-	if (rayangle > 0 && rayangle < M_PI)
-		vars->tempy += TILE_SIZE;
-	vars->tempx = vars->player.x
-		+ (vars->tempy - vars->player.y) / tan(rayangle);
-	vars->temp1y = TILE_SIZE;
-	if (!(rayangle > 0 && rayangle < M_PI))
-		vars->temp1y *= -1;
-	vars->temp1x = TILE_SIZE / tan(rayangle);
-	if ((rayangle < 0.5 * M_PI || rayangle > 1.5 * M_PI) && vars->temp1x < 0)
-		vars->temp1x = vars->temp1x * -1;
-	if (!(rayangle < 0.5 * M_PI || rayangle > 1.5 * M_PI) && vars->temp1x > 0)
-			vars->temp1x = vars->temp1x * -1;
-	horizontalcast1(vars, rayangle, l);
 }
 
 void verticalcast1(t_vars *vars, double rayangle, int l)
@@ -253,6 +236,26 @@ void verticalcast1(t_vars *vars, double rayangle, int l)
 	else
 		vars->player.ndist = 10000000;
 }
+void horizontalcast(int columnid, t_vars *vars, double rayangle)
+{
+	int	l;
+
+	l = 0;
+	vars->tempy = floor(vars->player.y / TILE_SIZE) * TILE_SIZE;
+	if (rayangle > 0 && rayangle < M_PI)
+		vars->tempy += TILE_SIZE;
+	vars->tempx = vars->player.x
+		+ (vars->tempy - vars->player.y) / tan(rayangle);
+	vars->temp1y = TILE_SIZE;
+	if (!(rayangle > 0 && rayangle < M_PI))
+		vars->temp1y *= -1;
+	vars->temp1x = TILE_SIZE / tan(rayangle);
+	if ((rayangle < 0.5 * M_PI || rayangle > 1.5 * M_PI) && vars->temp1x < 0)
+		vars->temp1x = vars->temp1x * -1;
+	if (!(rayangle < 0.5 * M_PI || rayangle > 1.5 * M_PI) && vars->temp1x > 0)
+			vars->temp1x = vars->temp1x * -1;
+	horizontalcast1(vars, rayangle, l);
+}
 
 void	verticalcast(int columnid, t_vars *vars, double rayangle)
 {
@@ -275,65 +278,63 @@ void	verticalcast(int columnid, t_vars *vars, double rayangle)
 	verticalcast1(vars, rayangle, l);
 }
 
-int	get_color(t_vars *vars, int y, int x,double rayangle)
+int	get_v_color(t_vars	*vars, int y, int x, double	rayangle)
 {
 	char	*pixel;
 	int		color;
-	if(vars->player.l)
+
+	if (rayangle > 0 && rayangle < M_PI)
 	{
-		if(rayangle > 0 && rayangle < M_PI)
-		{
-			pixel = vars->S.addr + y * vars->S.line_length
-				+ x * (vars->S.bits_per_pixel / 8);
-			color = *((int *) pixel);
-		}
-		else if(!(rayangle > 0 && rayangle < M_PI))
-		{
-			//printf("%f\n",rayangle);
-			pixel = vars->N.addr + y * vars->N.line_length
-				+ x * (vars->N.bits_per_pixel / 8);
-			color = *((int *) pixel);
-		}
+		pixel = vars->s.addr + y * vars->s.line_length
+			+ x * (vars->s.bits_per_pixel / 8);
+		color = *((int *) pixel);
 	}
+	else if (!(rayangle > 0 && rayangle < M_PI))
+	{
+		pixel = vars->n.addr + y * vars->n.line_length
+			+ x * (vars->n.bits_per_pixel / 8);
+		color = *((int *) pixel);
+	}
+	return (color);
+}
+
+int	get_color(t_vars *vars, int y, int x, double rayangle)
+{
+	char	*pixel;
+	int		color;
+
+	if (vars->player.l)
+		return (get_v_color(vars, y, x,rayangle));
 	else
 	{
-		if(!(rayangle < 0.5 * M_PI || rayangle > 1.5 * M_PI))
+		if (!(rayangle < 0.5 * M_PI || rayangle > 1.5 * M_PI))
 		{
-			pixel = vars->E.addr + y * vars->E.line_length
-				+ x * (vars->E.bits_per_pixel / 8);
+			pixel = vars->e.addr + y * vars->e.line_length
+				+ x * (vars->e.bits_per_pixel / 8);
 			color = *((int *) pixel);
 		}
 		else
 		{
-			pixel = vars->W.addr + y * vars->W.line_length
-				+ x * (vars->W.bits_per_pixel / 8);
+			pixel = vars->w.addr + y * vars->w.line_length
+				+ x * (vars->w.bits_per_pixel / 8);
 			color = *((int *) pixel);
 		}
 	}
 	return (color);
 }
 
-void	reder3d1(t_vars *vars, double wallstripheight, int j,double rayangle)
+void	draw_f_c(t_vars *vars, int wallbot,int j)
 {
-	int	walltop;
-	int	wallbot;
-	int	distft;
-	double i = 0;
-	walltop = ((1080) / 2) - (wallstripheight / 2);
-	if (walltop < 0 || walltop >= vars->height * TILE_SIZE)
-		walltop = 0;
-	wallbot = ((1080) / 2) + (wallstripheight / 2);
-	if (wallbot >= 1080 || wallbot < 0)
-		wallbot = (1080) - 1;
-	
-	while(i <= ((1080) - wallbot))
+	double	i;
+
+	i = 0;
+	while (i <= ((1080) - wallbot))
 	{
 		my_mlx_pixel_put(&vars->img, (1920) - (j + 1), i, vars->c);
 		i++;
 	}
 	i = wallbot;
-	//printf("%d--%d\n",i,vars->height * TILE_SIZE);
-	while(i < 1080)
+	while (i < 1080)
 	{
 		my_mlx_pixel_put(&vars->img, (1920) - (j + 1), i, vars->f);
 		i++;
@@ -342,14 +343,28 @@ void	reder3d1(t_vars *vars, double wallstripheight, int j,double rayangle)
 		vars->player.nrealx = (int)vars->player.realx % 64;
 	else
 		vars->player.nrealx = (int)vars->player.realy % 64;
-		//printf("%f\n",rayangle);
+}
+
+void	reder3d1(t_vars *vars, double wallstripheight, int j,double rayangle)
+{
+	int	walltop;
+	int	wallbot;
+	int	distft;
+
+	walltop = ((1080) / 2) - (wallstripheight / 2);
+	if (walltop < 0 || walltop >= vars->height * TILE_SIZE)
+		walltop = 0;
+	wallbot = ((1080) / 2) + (wallstripheight / 2);
+	if (wallbot >= 1080 || wallbot < 0)
+		wallbot = (1080) - 1;
+	draw_f_c(vars, wallbot, j);
 	while (wallbot > walltop)
 	{
-		distft = walltop + (wallstripheight / 2 ) - ((1080) / 2);
-		vars->player.nrealy = distft * ((float)64/ wallstripheight);
+		distft = walltop + (wallstripheight / 2) - ((1080) / 2);
+		vars->player.nrealy = distft * ((float)64 / wallstripheight);
 		my_mlx_pixel_put(&vars->img, (1920 - 1) - (j),
 			walltop, get_color(vars,
-				(int)vars->player.nrealy, (int)vars->player.nrealx,rayangle));
+				(int)vars->player.nrealy, (int)vars->player.nrealx, rayangle));
 		walltop++;
 	}
 }
@@ -361,20 +376,19 @@ void render3d(t_vars *vars, int j, double rayangle)
 	int		wallstripheight;
 
 	raydistance = vars->player.dist
-		* cos(rayangle - vars->player.rotationAngle);
-	distprojectionplan = (1920 / 2) 
+		* cos(rayangle - vars->player.rotationangle);
+	distprojectionplan = (1920 / 2)
 		/ tan(vars->player.fov_angle / 2);
 	wallstripheight = ((int)(TILE_SIZE / raydistance * distprojectionplan));
-	reder3d1(vars, wallstripheight, j,rayangle);
+	reder3d1(vars, wallstripheight, j, rayangle);
 }
 
 void	cast(int columnid, t_vars *vars , double rayangle)
 {
-	horizontalcast(columnid, vars,rayangle);
-	verticalcast(columnid, vars,rayangle);
+	horizontalcast(columnid, vars, rayangle);
+	verticalcast(columnid, vars, rayangle);
 	if ((vars->player.dist < vars->player.ndist))
 	{
-		//printf("ana fdst\n");
 		//draw_line(vars, rayangle, vars->player.realx, vars->player.realy);
 		vars->player.l = 1;
 	}
@@ -395,7 +409,7 @@ void castRays(t_vars *vars)
 	int		i;
 
 	i = 0;
-	rayangle = vars->player.rotationAngle - (vars->player.fov_angle / 2);
+	rayangle = vars->player.rotationangle - (vars->player.fov_angle / 2);
 	while (i < vars->player.ray_num)
 	{
 		rayangle += vars->player.fov_angle / vars->player.ray_num;
@@ -405,53 +419,39 @@ void castRays(t_vars *vars)
 		i++;
 	}
 }
-int lol(t_vars *vars,double movestep)
-{
-	double	rayangle;
-	double	x;
-	double	y;
 
-	rayangle = vars->player.rotationAngle += 1
-			* vars->player.rotationSpeed;
-	x = vars->player.x + cos(rayangle) * movestep;
-	y = vars->player.y + sin(rayangle) * movestep;
-	if (vars->map[((int)(y) / TILE_SIZE)][((int)(x) / TILE_SIZE)] == '1')
-		return (1);
-	rayangle = vars->player.rotationAngle += -1
-			* vars->player.rotationSpeed;
-	x = vars->player.x + cos(rayangle) * movestep;
-	y = vars->player.y + sin(rayangle) * movestep;
-	if (vars->map[((int)(y) / TILE_SIZE)][((int)(x) / TILE_SIZE)] == '1')
-		return (1);
-	return(0);
+int lol(t_vars *vars,double y,double x)
+{
+	if (vars->map[((int)y / TILE_SIZE)][((int)(x + 5) / TILE_SIZE)] == '1')
+		return(0);
+	else if (vars->map[((int)y / TILE_SIZE)][((int)(x - 5) / TILE_SIZE)] == '1')
+		return(0);
+	else if (vars->map[((int)(y + 5) / TILE_SIZE)][((int)x / TILE_SIZE)] == '1')
+		return(0);
+	else if (vars->map[((int)(y - 5) / TILE_SIZE)][((int)x / TILE_SIZE)] == '1')
+		return(0);
+	return(1);
 }
+
 int walk(t_vars *vars,double movestep,double y,double x)
 {
 	if (vars->player.d == 2)
 	{
-		x += cos(vars->player.rotationAngle + M_PI / 2) * movestep;
-		y += sin(vars->player.rotationAngle + M_PI / 2) * movestep;
+		x += cos(vars->player.rotationangle + M_PI / 2) * movestep;
+		y += sin(vars->player.rotationangle + M_PI / 2) * movestep;
 	}
 	else
 	{
-		x += cos(vars->player.rotationAngle) * movestep;
-		y += sin(vars->player.rotationAngle) * movestep;
+		x += cos(vars->player.rotationangle) * movestep;
+		y += sin(vars->player.rotationangle) * movestep;
 	}
 	if (x >= 0 && x <= vars->width * TILE_SIZE && y >= 0
 		&& y <= vars->height * TILE_SIZE
 		&& vars->map[((int)floor(y / TILE_SIZE))]
 		[((int)floor(x / TILE_SIZE))] != '1')
 	{
-		//if(lol(vars,movestep))
-		//	return(1);
-		if (vars->map[((int)y / TILE_SIZE)][((int)(x + 2) / TILE_SIZE)] == '1')
-			x = vars->player.x;
-		else if (vars->map[((int)y / TILE_SIZE)][((int)(x - 2) / TILE_SIZE)] == '1')
-			x = vars->player.x;
-		else if (vars->map[((int)(y + 2) / TILE_SIZE)][((int)x / TILE_SIZE)] == '1')
-			y = vars->player.y;
-		else if (vars->map[((int)(y - 2) / TILE_SIZE)][((int)x / TILE_SIZE)] == '1')
-			y = vars->player.y;
+		if (!lol(vars, y, x))
+			return (0);
 		vars->player.x = x;
 		vars->player.y = y;
 		vars->v = 1;
@@ -464,23 +464,27 @@ void direction(t_vars *vars)
 	double	x;
 	double	y;
 
-	if (vars->player.turnDirection)
+	if (vars->player.turndirection)
 	{
-		vars->player.rotationAngle += vars->player.turnDirection
-			* vars->player.rotationSpeed;
+		vars->player.rotationangle += vars->player.turndirection
+			* vars->player.rotationspeed;
 		vars->v = 1;
 	}
-	if (vars->player.walkDirection)
+	if (vars->player.walkdirection)
 	{
-		vars->player.rotationAngle += vars->player.turnDirection
-			* vars->player.rotationSpeed;
-		movestep = vars->player.walkDirection * vars->player.moveSpeed;
+		vars->player.rotationangle += vars->player.turndirection
+			* vars->player.rotationspeed;
+		movestep = vars->player.walkdirection * vars->player.movespeed;
 		y = vars->player.y;
 		x = vars->player.x;
 		walk(vars, movestep, y, x);
 	}
 }
-
+int ft_exit(t_vars *vars)
+{
+	(void)vars;
+	exit(0);
+}
 int	update(t_vars *vars)
 {
 	double	x;
@@ -490,6 +494,7 @@ int	update(t_vars *vars)
 	mlx_hook(vars->mlx_win, 2, 1L << 0, key_pressed, vars);
 	direction(vars);
 	mlx_hook(vars->mlx_win, 3, 1L << 0, key_release, vars);
+	mlx_hook(vars->mlx_win, 17, 1L << 0, ft_exit, vars);
 	if (vars->v == 1)
 	{
 		vars->img.img = mlx_new_image(vars->mlx,
@@ -497,9 +502,7 @@ int	update(t_vars *vars)
 		vars->img.addr = mlx_get_data_addr(vars->img.img,
 				&vars->img.bits_per_pixel,
 				&vars->img.line_length, &vars->img.endian);
-		//render(vars);
 		castRays(vars);
-		//draw_square(vars);
 		mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img.img, 0, 0);	
 		vars->v = 0;
 	}
@@ -530,7 +533,7 @@ double	get_view(char	a)
 {
 	if ( a == 'N')
 		return (3 * M_PI / 2);
-	else if (a == 'S')
+	else if (a == 's')
 		return (M_PI / 2);
 	else if (a == 'W')
 		return (M_PI);
@@ -538,39 +541,44 @@ double	get_view(char	a)
 		return (2 * M_PI);
 }
 
-void init_player(t_vars *vars,t_prasing_data *data)
+void tex_add(t_vars *vars,t_prasing_data *data)
+{
+		vars->e.img = mlx_xpm_file_to_image(vars->mlx,
+			data->east, &vars->e.w, &vars->e.h);
+	vars->e.addr = mlx_get_data_addr(vars->e.img,
+			&vars->e.bits_per_pixel,
+			&vars->e.line_length, &vars->e.endian);
+		vars->w.img = mlx_xpm_file_to_image(vars->mlx,
+			data->west, &vars->w.w, &vars->w.h);
+	vars->w.addr = mlx_get_data_addr(vars->w.img,
+			&vars->w.bits_per_pixel,
+			&vars->w.line_length, &vars->w.endian);
+		vars->s.img = mlx_xpm_file_to_image(vars->mlx,
+			data->south, &vars->s.w, &vars->s.h);
+	vars->s.addr = mlx_get_data_addr(vars->s.img,
+			&vars->s.bits_per_pixel,
+			&vars->s.line_length, &vars->s.endian);
+		vars->n.img = mlx_xpm_file_to_image(vars->mlx,
+			data->north, &vars->n.w, &vars->n.h);
+	vars->n.addr = mlx_get_data_addr(vars->n.img,
+			&vars->n.bits_per_pixel,
+			&vars->n.line_length, &vars->n.endian);
+}
+
+void init_player(t_vars *vars, t_prasing_data *data)
 {
 	int	w;
 	int	h;
 
 	vars->player.raduis = 3;
-	vars->player.turnDirection = 0;
-	vars->player.walkDirection = 0;
-	vars->player.rotationAngle = get_view(data->direction);
-	vars->player.moveSpeed = 10;
-	vars->player.rotationSpeed = 3 * (M_PI / 180);
+	vars->player.turndirection = 0;
+	vars->player.walkdirection = 0;
+	vars->player.rotationangle = get_view(data->direction);
+	vars->player.movespeed = 10;
+	vars->player.rotationspeed = 3 * (M_PI / 180);
 	vars->player.fov_angle = 60 * (M_PI / 180);
 	vars->player.ray_num = (1920);
-	vars->E.img = mlx_xpm_file_to_image(vars->mlx,
-			data->east, &vars->E.w, &vars->E.h);
-	vars->E.addr = mlx_get_data_addr(vars->E.img,
-			&vars->E.bits_per_pixel,
-			&vars->E.line_length, &vars->E.endian);
-		vars->W.img = mlx_xpm_file_to_image(vars->mlx,
-			data->east, &vars->W.w, &vars->W.h);
-	vars->W.addr = mlx_get_data_addr(vars->W.img,
-			&vars->W.bits_per_pixel,
-			&vars->W.line_length, &vars->W.endian);
-		vars->S.img = mlx_xpm_file_to_image(vars->mlx,
-			data->south, &vars->S.w, &vars->S.h);
-	vars->S.addr = mlx_get_data_addr(vars->S.img,
-			&vars->S.bits_per_pixel,
-			&vars->S.line_length, &vars->S.endian);
-		vars->N.img = mlx_xpm_file_to_image(vars->mlx,
-			data->north, &vars->N.w, &vars->N.h);
-	vars->N.addr = mlx_get_data_addr(vars->N.img,
-			&vars->N.bits_per_pixel,
-			&vars->N.line_length, &vars->N.endian);
+	tex_add(vars, data);
 	vars->v = 1;
 }
 
@@ -606,37 +614,50 @@ void	get_pos(t_vars *vars,t_prasing_data *data)
 	}
 }
 
-int get_rgb(char **str)
+int	get_rgb(char	**str)
 {
-	char **a;
-	a = ft_split(*str,' ');
-	int r = atoi(a[1]);
-	int g = atoi(str[1]);
-	int b = atoi(str[2]);
-	free(a[0]);
-	free(a[1]);
-	free(a);
-	return(createRGB(r,g,b));
-}
-char **editmap(char **map)
-{
-	int l = get_width(map);
-	int i = 0;
-	int j = 0;
-	char **m;
-	
-	m = malloc(sizeof(char *) * (get_height(map) + 1));
-	while(map[j])
+	int		x;
+	int		r;
+	int		g;
+	int		b;
+	char	*ptr;
+
+	x = 1;
+	while (str[0][x])
 	{
-		i =0;
+		if (whitespace(str[0][x]))
+		{
+			ptr = ft_substr(str[0], x, ft_strlen(str[0]));
+			break ;
+		}
+		x++;
+	}
+	r = atoi(ptr);
+	g = atoi(str[1]);
+	b = atoi(str[2]);
+	free(ptr);
+	return (createRGB(r, g, b));
+}
+
+char **editmap(char **map, int l)
+{
+	int		i;
+	int		j;
+	char	**m;
+
+	j = 0;
+	m = malloc(sizeof(char *) * (get_height(map) + 1));
+	while (map[j])
+	{
+		i = 0;
 		m[j] = malloc(sizeof(char) * l + 1);
 		m[j][l] = 0;
-		while(map[j][i])
+		while (map[j][i])
 		{
 			m[j][i] = map[j][i];
 			i++;
 		}
-		while(i < l)
+		while (i < l)
 		{
 			m[j][i] = '1';
 			i++;
@@ -644,14 +665,7 @@ char **editmap(char **map)
 		j++;
 	}
 	m[j] = 0;
-	i = 0;
-	while(m[i])
-	{
-		printf("%s\n",m[i]);
-		i++;
-	}
-	//exit(0);
-	return(m);
+	return (m);
 }
 
 int	main(int ac, char **av)
@@ -662,8 +676,7 @@ int	main(int ac, char **av)
 	if (ac != 2 || !type_check(av[1]))
 		print_error("error");
 	parsing(av[1], &data);
-	vars.map = editmap(data.map);
-	vars.ceiling = data.ceiling;
+	vars.map = editmap(data.map, get_width(data.map));
 	vars.f = get_rgb(data.floor);
 	vars.c = get_rgb(data.ceiling);
 	get_pos(&vars, &data);

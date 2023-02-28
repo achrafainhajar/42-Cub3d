@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/11 14:10:57 by mrafik            #+#    #+#             */
-/*   Updated: 2023/02/27 21:09:23 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/02/28 23:53:18 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 
 typedef struct t_prasing_data
 {
-		char	*north;
+	char	*north;
 	char	*south;
 	char	*west;
 	char	*east;
@@ -30,72 +30,71 @@ typedef struct t_prasing_data
 	char	direction;
 }			t_prasing_data;
 
-# define A_KEY 0
-# define D_KEY 2
-# define S_KEY 1
-# define W_KEY 13
-# define scale_factor 1
-# define TILE_SIZE 64
+# define A_KEY			0
+# define D_KEY			2
+# define S_KEY			1
+# define W_KEY			13
+# define TILE_SIZE		64
 
-typedef struct t_img {
-    void *img;
-    int bits_per_pixel;
-    int line_length;
-    int endian;
-    char  *addr;
-}				img;
+typedef struct s_img {
+	void	*img;
+	int		bits_per_pixel;
+	int		line_length;
+	int		endian;
+	char	*addr;
+}t_img;
 
-typedef struct t_player
+typedef struct s_player
 {
-    double x;
-    double y;
-    int l;
-    double realx;
-    double nrealx;
-    double nrealy;
-    long ndist;
-    double realy;
-    int raduis;
-    int turnDirection;
-    int walkDirection;
-    double rotationAngle;
-    double moveSpeed;
-    double rotationSpeed;
-    double fov_angle;
-    int ray_num;
-    long dist;
-    int d;
-}               Player;
+	double	x;
+	double	y;
+	int		l;
+	double	realx;
+	double	nrealx;
+	double	nrealy;
+	long	ndist;
+	double	realy;
+	int		raduis;
+	int		turndirection;
+	int		walkdirection;
+	double	rotationangle;
+	double	movespeed;
+	double	rotationspeed;
+	double	fov_angle;
+	int		ray_num;
+	long	dist;
+	int		d;
+}t_Player;
 typedef struct textures {
-     void *img;
-    int bits_per_pixel;
-    int line_length;
-    int endian;
-    char  *addr;
-    int w;
-    int h;
-}				tex;
+	void	*img;
+	int		bits_per_pixel;
+	int		line_length;
+	int		endian;
+	char	*addr;
+	int		w;
+	int		h;
+}t_tex;
 typedef struct s_vars {
-    void        *mlx;
-    int         width;
-    int         height;
-    void        *mlx_win;
+	void		*mlx;
+	int			width;
+	int			height;
+	void		*mlx_win;
 	char		**map;
-    img         img;
-    int v;
-    tex         N;
-    tex         W;
-    tex         E;
-    tex         S;
-    int f;
-    int c;
-    Player      player;
-    char	**floor;
-	char	**ceiling;
-    double   tempx;
-    double   tempy;
-    double   temp1x;
-    double   temp1y;
+	t_img		img;
+	int			v;
+	t_tex		n;
+	t_tex		w;
+	t_tex		e;
+	t_tex		s;
+	int			f;
+	int			c;
+	t_Player	player;
+	char		**floor;
+	char		**ceiling;
+	double		tempx;
+	double		tempy;
+	double		temp1x;
+	double		temp1y;
 }				t_vars;
 
 int		ft_strlen(const char *s);
@@ -128,7 +127,7 @@ void	check_stranger(char **str, int x, t_prasing_data *data);
 void	get_direction(int t, t_prasing_data *data, char **str);
 void	init(t_prasing_data *data);
 int		store_data(char *str, t_prasing_data *data, int i);
-int 	store_helper(char *str, int i, t_prasing_data *data, char *tmp);
+int		store_helper(char *str, int i, t_prasing_data *data, char *tmp);
 int		texter_type(char *map);
 int		check_texter(char *str, int i);
 int		search(char *str, char *ptr, int i);

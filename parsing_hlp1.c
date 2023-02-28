@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/25 12:51:50 by mrafik            #+#    #+#             */
-/*   Updated: 2023/02/26 16:16:17 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/02/28 23:52:03 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,6 @@ int	store_data(char *str, t_prasing_data *data, int i)
 	fd = open(tmp, 0);
 	if (fd < 0 || !texter_type(tmp))
 		print_error("Bad file descriptor or file not xpm");
-	//free(tmp);
 	if (store_helper(str, i, data, tmp))
 		return (1);
 	else if (search(str, "SO", i))

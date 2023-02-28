@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/25 12:53:22 by mrafik            #+#    #+#             */
-/*   Updated: 2023/02/26 16:14:05 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/02/28 23:52:08 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ int	is_color(char *str)
 
 	color_helper(str);
 	tmp = ft_split(str, ',');
+	if (ft_strlen2(tmp, 0) != 3)
+		print_error("Error");
 	i = 0;
 	while (tmp[i])
 	{
