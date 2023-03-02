@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/11 14:10:57 by mrafik            #+#    #+#             */
-/*   Updated: 2023/02/28 23:53:18 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/03/01 19:20:18 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,7 @@ typedef struct textures {
 }t_tex;
 typedef struct s_vars {
 	void		*mlx;
+	int h;
 	int			width;
 	int			height;
 	void		*mlx_win;

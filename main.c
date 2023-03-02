@@ -6,10 +6,9 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 21:36:11 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/02/28 23:51:19 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/03/02 00:01:27 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 // void	my_mlx_pixel_put(img *data, int x, int y, int color);
 // void draw_map(t_vars *vars,int x,int y)
@@ -159,9 +158,10 @@ int	key_release(int key_code, t_vars	*vars)
 		vars->player.d = 0;
 		vars->player.walkdirection = 0;
 	}
+	return (0);
 }
 
-double	dist(double ax, double ay, double bx, double by, double ang)
+double	dist(double ax, double ay, double bx, double by)
 {
 	return (sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)));
 }
@@ -197,14 +197,14 @@ void	horizontalcast1(t_vars *vars, double rayangle, int l)
 			l = 1;
 			break ;
 		}
-		vars->tempx = vars->tempx + vars->temp1x;
-		vars->tempy = vars->tempy + vars->temp1y;
+		vars->tempx += vars->temp1x;
+		vars->tempy += vars->temp1y;
 	}
 	vars->player.realx = vars->tempx;
 	vars->player.realy = vars->tempy;
 	if (l == 1)
 		vars->player.dist = dist(vars->player.x, vars->player.y,
-				vars->tempx, vars->tempy, rayangle);
+				vars->tempx, vars->tempy);
 	else
 		vars->player.dist = 10000000;
 }
@@ -232,11 +232,11 @@ void verticalcast1(t_vars *vars, double rayangle, int l)
 	vars->player.nrealy = vars->tempy;
 	if (l == 1)
 		vars->player.ndist = dist(vars->player.x, vars->player.y,
-				vars->tempx, vars->tempy, rayangle);
+				vars->tempx, vars->tempy);
 	else
 		vars->player.ndist = 10000000;
 }
-void horizontalcast(int columnid, t_vars *vars, double rayangle)
+void horizontalcast(t_vars *vars, double rayangle)
 {
 	int	l;
 
@@ -257,7 +257,7 @@ void horizontalcast(int columnid, t_vars *vars, double rayangle)
 	horizontalcast1(vars, rayangle, l);
 }
 
-void	verticalcast(int columnid, t_vars *vars, double rayangle)
+void	verticalcast(t_vars *vars, double rayangle)
 {
 	int	l;
 
@@ -283,6 +283,7 @@ int	get_v_color(t_vars	*vars, int y, int x, double	rayangle)
 	char	*pixel;
 	int		color;
 
+	color = 0;
 	if (rayangle > 0 && rayangle < M_PI)
 	{
 		pixel = vars->s.addr + y * vars->s.line_length
@@ -304,7 +305,7 @@ int	get_color(t_vars *vars, int y, int x, double rayangle)
 	int		color;
 
 	if (vars->player.l)
-		return (get_v_color(vars, y, x,rayangle));
+		return (get_v_color(vars, y, x, rayangle));
 	else
 	{
 		if (!(rayangle < 0.5 * M_PI || rayangle > 1.5 * M_PI))
@@ -352,7 +353,7 @@ void	reder3d1(t_vars *vars, double wallstripheight, int j,double rayangle)
 	int	distft;
 
 	walltop = ((1080) / 2) - (wallstripheight / 2);
-	if (walltop < 0 || walltop >= vars->height * TILE_SIZE)
+	if (walltop < 0 || walltop >= 1080)
 		walltop = 0;
 	wallbot = ((1080) / 2) + (wallstripheight / 2);
 	if (wallbot >= 1080 || wallbot < 0)
@@ -383,10 +384,10 @@ void render3d(t_vars *vars, int j, double rayangle)
 	reder3d1(vars, wallstripheight, j, rayangle);
 }
 
-void	cast(int columnid, t_vars *vars , double rayangle)
+void	cast(t_vars *vars , double rayangle)
 {
-	horizontalcast(columnid, vars, rayangle);
-	verticalcast(columnid, vars, rayangle);
+	horizontalcast(vars, rayangle);
+	verticalcast(vars, rayangle);
 	if ((vars->player.dist < vars->player.ndist))
 	{
 		//draw_line(vars, rayangle, vars->player.realx, vars->player.realy);
@@ -414,7 +415,7 @@ void castRays(t_vars *vars)
 	{
 		rayangle += vars->player.fov_angle / vars->player.ray_num;
 		rayangle = normalizeangle(rayangle);
-		cast(i, vars, rayangle);
+		cast(vars, rayangle);
 		render3d(vars, i, rayangle);
 		i++;
 	}
@@ -423,14 +424,14 @@ void castRays(t_vars *vars)
 int lol(t_vars *vars,double y,double x)
 {
 	if (vars->map[((int)y / TILE_SIZE)][((int)(x + 5) / TILE_SIZE)] == '1')
-		return(0);
+		return (0);
 	else if (vars->map[((int)y / TILE_SIZE)][((int)(x - 5) / TILE_SIZE)] == '1')
-		return(0);
+		return (0);
 	else if (vars->map[((int)(y + 5) / TILE_SIZE)][((int)x / TILE_SIZE)] == '1')
-		return(0);
+		return (0);
 	else if (vars->map[((int)(y - 5) / TILE_SIZE)][((int)x / TILE_SIZE)] == '1')
-		return(0);
-	return(1);
+		return (0);
+	return (1);
 }
 
 int walk(t_vars *vars,double movestep,double y,double x)
@@ -456,6 +457,7 @@ int walk(t_vars *vars,double movestep,double y,double x)
 		vars->player.y = y;
 		vars->v = 1;
 	}
+	return(0);
 }
 
 void direction(t_vars *vars)
@@ -480,32 +482,35 @@ void direction(t_vars *vars)
 		walk(vars, movestep, y, x);
 	}
 }
+
 int ft_exit(t_vars *vars)
 {
 	(void)vars;
 	exit(0);
 }
+
 int	update(t_vars *vars)
 {
-	double	x;
-	double	y;
-	double	movestep;
+	(void)vars;
 
 	mlx_hook(vars->mlx_win, 2, 1L << 0, key_pressed, vars);
 	direction(vars);
 	mlx_hook(vars->mlx_win, 3, 1L << 0, key_release, vars);
 	mlx_hook(vars->mlx_win, 17, 1L << 0, ft_exit, vars);
 	if (vars->v == 1)
-	{
+	{	
+		if (vars->h == 1)
+			mlx_destroy_image(vars->mlx, vars->img.img);
 		vars->img.img = mlx_new_image(vars->mlx,
 				1920, 1080);
 		vars->img.addr = mlx_get_data_addr(vars->img.img,
 				&vars->img.bits_per_pixel,
 				&vars->img.line_length, &vars->img.endian);
 		castRays(vars);
-		mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img.img, 0, 0);	
+		mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img.img, 0, 0);
 		vars->v = 0;
 	}
+	return (0);
 }
 
 int	get_width(char	**map)
@@ -539,27 +544,30 @@ double	get_view(char	a)
 		return (M_PI);
 	else if (a == 'E')
 		return (2 * M_PI);
+	return (0);
 }
 
 void tex_add(t_vars *vars,t_prasing_data *data)
 {
-		vars->e.img = mlx_xpm_file_to_image(vars->mlx,
+	vars->e.img = mlx_xpm_file_to_image(vars->mlx,
 			data->east, &vars->e.w, &vars->e.h);
+	vars->w.img = mlx_xpm_file_to_image(vars->mlx,
+			data->west, &vars->w.w, &vars->w.h);
+	vars->s.img = mlx_xpm_file_to_image(vars->mlx,
+			data->south, &vars->s.w, &vars->s.h);
+	vars->n.img = mlx_xpm_file_to_image(vars->mlx,
+			data->north, &vars->n.w, &vars->n.h);
+	if (!vars->n.img || !vars->w.img || !vars->e.img || !vars->s.img)
+		print_error("error");
 	vars->e.addr = mlx_get_data_addr(vars->e.img,
 			&vars->e.bits_per_pixel,
 			&vars->e.line_length, &vars->e.endian);
-		vars->w.img = mlx_xpm_file_to_image(vars->mlx,
-			data->west, &vars->w.w, &vars->w.h);
 	vars->w.addr = mlx_get_data_addr(vars->w.img,
 			&vars->w.bits_per_pixel,
 			&vars->w.line_length, &vars->w.endian);
-		vars->s.img = mlx_xpm_file_to_image(vars->mlx,
-			data->south, &vars->s.w, &vars->s.h);
 	vars->s.addr = mlx_get_data_addr(vars->s.img,
 			&vars->s.bits_per_pixel,
 			&vars->s.line_length, &vars->s.endian);
-		vars->n.img = mlx_xpm_file_to_image(vars->mlx,
-			data->north, &vars->n.w, &vars->n.h);
 	vars->n.addr = mlx_get_data_addr(vars->n.img,
 			&vars->n.bits_per_pixel,
 			&vars->n.line_length, &vars->n.endian);
@@ -567,15 +575,12 @@ void tex_add(t_vars *vars,t_prasing_data *data)
 
 void init_player(t_vars *vars, t_prasing_data *data)
 {
-	int	w;
-	int	h;
-
 	vars->player.raduis = 3;
 	vars->player.turndirection = 0;
 	vars->player.walkdirection = 0;
 	vars->player.rotationangle = get_view(data->direction);
 	vars->player.movespeed = 10;
-	vars->player.rotationspeed = 3 * (M_PI / 180);
+	vars->player.rotationspeed = 10 * (M_PI / 180);
 	vars->player.fov_angle = 60 * (M_PI / 180);
 	vars->player.ray_num = (1920);
 	tex_add(vars, data);
@@ -589,7 +594,7 @@ int	get_height(char **map)
 	i = 0;
 	while (map[i])
 		i++;
-	printf("%d\n",i);
+	//printf("%d\n",i);
 	return (i);
 }
 void	get_pos(t_vars *vars,t_prasing_data *data)
@@ -623,6 +628,7 @@ int	get_rgb(char	**str)
 	char	*ptr;
 
 	x = 1;
+	ptr = NULL;
 	while (str[0][x])
 	{
 		if (whitespace(str[0][x]))
@@ -673,6 +679,7 @@ int	main(int ac, char **av)
 	t_vars			vars;
 	t_prasing_data	data;
 
+	vars.h = 0;
 	if (ac != 2 || !type_check(av[1]))
 		print_error("error");
 	parsing(av[1], &data);
@@ -687,6 +694,8 @@ int	main(int ac, char **av)
 	vars.mlx_win = mlx_new_window(vars.mlx, 1920,
 			1080, "Cub3d");
 	init_player(&vars, &data);
+	update(&vars);
+	vars.h = 1;
 	mlx_loop_hook(vars.mlx, update, &vars);
 	mlx_loop(vars.mlx);
 }

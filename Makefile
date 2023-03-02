@@ -6,7 +6,7 @@ OBJCT	=	${SRCS:.c=.o}
 
 RM		=	rm -f
 
-CC		=	gcc  -g3
+CC		=	gcc  -Wall -Wextra -Werror
 
 all : $(NAME)
 
