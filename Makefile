@@ -6,7 +6,7 @@ OBJCT	=	${SRCS:.c=.o}
 
 RM		=	rm -f
 
-CC		=	gcc  -Wall -Wextra -Werror
+CC		=	gcc  -fsanitize=address  -Wall -Wextra -Werror
 
 all : $(NAME)
 

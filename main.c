@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 21:36:11 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/03/02 21:02:04 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/03/02 21:28:30 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -334,7 +334,7 @@ void	draw_f_c(t_vars *vars, int wallbot,int j)
 		my_mlx_pixel_put(&vars->img, (WIDTH) - (j + 1), i, vars->c);
 		i++;
 	}
-	i = wallbot;
+	i = wallbot + 1;
 	while (i < HEIGHT)
 	{
 		my_mlx_pixel_put(&vars->img, (WIDTH) - (j + 1), i, vars->f);
@@ -457,7 +457,7 @@ int walk(t_vars *vars,double movestep,double y,double x)
 		vars->player.y = y;
 		vars->v = 1;
 	}
-	return(0);
+	return (0);
 }
 
 void direction(t_vars *vars)
@@ -492,7 +492,6 @@ int ft_exit(t_vars *vars)
 int	update(t_vars *vars)
 {
 	(void)vars;
-
 	mlx_hook(vars->mlx_win, 2, 1L << 0, key_pressed, vars);
 	direction(vars);
 	mlx_hook(vars->mlx_win, 3, 1L << 0, key_release, vars);
@@ -580,7 +579,7 @@ void init_player(t_vars *vars, t_prasing_data *data)
 	vars->player.walkdirection = 0;
 	vars->player.rotationangle = get_view(data->direction);
 	vars->player.movespeed = 10;
-	vars->player.rotationspeed = 10 * (M_PI / 180);
+	vars->player.rotationspeed = 2 * (M_PI / 180);
 	vars->player.fov_angle = 60 * (M_PI / 180);
 	vars->player.ray_num = (WIDTH);
 	tex_add(vars, data);
