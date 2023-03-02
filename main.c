@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 21:36:11 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/03/02 00:01:27 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/03/02 21:02:04 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -284,13 +284,13 @@ int	get_v_color(t_vars	*vars, int y, int x, double	rayangle)
 	int		color;
 
 	color = 0;
-	if (rayangle > 0 && rayangle < M_PI)
+	if (!(rayangle > 0 && rayangle < M_PI))
 	{
 		pixel = vars->s.addr + y * vars->s.line_length
 			+ x * (vars->s.bits_per_pixel / 8);
 		color = *((int *) pixel);
 	}
-	else if (!(rayangle > 0 && rayangle < M_PI))
+	else if ((rayangle > 0 && rayangle < M_PI))
 	{
 		pixel = vars->n.addr + y * vars->n.line_length
 			+ x * (vars->n.bits_per_pixel / 8);
@@ -329,15 +329,15 @@ void	draw_f_c(t_vars *vars, int wallbot,int j)
 	double	i;
 
 	i = 0;
-	while (i <= ((1080) - wallbot))
+	while (i <= ((HEIGHT) - wallbot))
 	{
-		my_mlx_pixel_put(&vars->img, (1920) - (j + 1), i, vars->c);
+		my_mlx_pixel_put(&vars->img, (WIDTH) - (j + 1), i, vars->c);
 		i++;
 	}
 	i = wallbot;
-	while (i < 1080)
+	while (i < HEIGHT)
 	{
-		my_mlx_pixel_put(&vars->img, (1920) - (j + 1), i, vars->f);
+		my_mlx_pixel_put(&vars->img, (WIDTH) - (j + 1), i, vars->f);
 		i++;
 	}
 	if (vars->player.l)
@@ -352,18 +352,18 @@ void	reder3d1(t_vars *vars, double wallstripheight, int j,double rayangle)
 	int	wallbot;
 	int	distft;
 
-	walltop = ((1080) / 2) - (wallstripheight / 2);
-	if (walltop < 0 || walltop >= 1080)
+	walltop = ((HEIGHT) / 2) - (wallstripheight / 2);
+	if (walltop < 0 || walltop >= HEIGHT)
 		walltop = 0;
-	wallbot = ((1080) / 2) + (wallstripheight / 2);
-	if (wallbot >= 1080 || wallbot < 0)
-		wallbot = (1080) - 1;
+	wallbot = ((HEIGHT) / 2) + (wallstripheight / 2);
+	if (wallbot >= HEIGHT || wallbot < 0)
+		wallbot = (HEIGHT) - 1;
 	draw_f_c(vars, wallbot, j);
 	while (wallbot > walltop)
 	{
-		distft = walltop + (wallstripheight / 2) - ((1080) / 2);
+		distft = walltop + (wallstripheight / 2) - ((HEIGHT) / 2);
 		vars->player.nrealy = distft * ((float)64 / wallstripheight);
-		my_mlx_pixel_put(&vars->img, (1920 - 1) - (j),
+		my_mlx_pixel_put(&vars->img, (WIDTH - 1) - (j),
 			walltop, get_color(vars,
 				(int)vars->player.nrealy, (int)vars->player.nrealx, rayangle));
 		walltop++;
@@ -378,7 +378,7 @@ void render3d(t_vars *vars, int j, double rayangle)
 
 	raydistance = vars->player.dist
 		* cos(rayangle - vars->player.rotationangle);
-	distprojectionplan = (1920 / 2)
+	distprojectionplan = (WIDTH / 2)
 		/ tan(vars->player.fov_angle / 2);
 	wallstripheight = ((int)(TILE_SIZE / raydistance * distprojectionplan));
 	reder3d1(vars, wallstripheight, j, rayangle);
@@ -498,11 +498,11 @@ int	update(t_vars *vars)
 	mlx_hook(vars->mlx_win, 3, 1L << 0, key_release, vars);
 	mlx_hook(vars->mlx_win, 17, 1L << 0, ft_exit, vars);
 	if (vars->v == 1)
-	{	
+	{
 		if (vars->h == 1)
 			mlx_destroy_image(vars->mlx, vars->img.img);
 		vars->img.img = mlx_new_image(vars->mlx,
-				1920, 1080);
+				WIDTH, HEIGHT);
 		vars->img.addr = mlx_get_data_addr(vars->img.img,
 				&vars->img.bits_per_pixel,
 				&vars->img.line_length, &vars->img.endian);
@@ -538,7 +538,7 @@ double	get_view(char	a)
 {
 	if ( a == 'N')
 		return (3 * M_PI / 2);
-	else if (a == 's')
+	else if (a == 'S')
 		return (M_PI / 2);
 	else if (a == 'W')
 		return (M_PI);
@@ -582,7 +582,7 @@ void init_player(t_vars *vars, t_prasing_data *data)
 	vars->player.movespeed = 10;
 	vars->player.rotationspeed = 10 * (M_PI / 180);
 	vars->player.fov_angle = 60 * (M_PI / 180);
-	vars->player.ray_num = (1920);
+	vars->player.ray_num = (WIDTH);
 	tex_add(vars, data);
 	vars->v = 1;
 }
@@ -691,8 +691,8 @@ int	main(int ac, char **av)
 	vars.mlx = mlx_init();
 	vars.height = get_height(vars.map);
 	vars.width = get_width(vars.map);
-	vars.mlx_win = mlx_new_window(vars.mlx, 1920,
-			1080, "Cub3d");
+	vars.mlx_win = mlx_new_window(vars.mlx, WIDTH,
+			HEIGHT, "Cub3d");
 	init_player(&vars, &data);
 	update(&vars);
 	vars.h = 1;

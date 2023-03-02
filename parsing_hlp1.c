@@ -6,7 +6,7 @@
 /*   By: aainhaja <aainhaja@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/25 12:51:50 by mrafik            #+#    #+#             */
-/*   Updated: 2023/02/28 23:52:03 by aainhaja         ###   ########.fr       */
+/*   Updated: 2023/03/02 20:46:18 by aainhaja         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,12 +43,16 @@ int	store_data(char *str, t_prasing_data *data, int i)
 	int		fd;
 	char	*tmp;
 	int		d;
+	int		b;
 
 	d = i;
 	d += 2;
+	b = ft_strlen(str)-1;
 	while (!whitespace(str[d]))
 		d++;
-	tmp = ft_substr(str, d, ft_strlen(str));
+	while (!whitespace(str[b]))
+		b--;
+	tmp = ft_substr(str, d, b - 2);
 	fd = open(tmp, 0);
 	if (fd < 0 || !texter_type(tmp))
 		print_error("Bad file descriptor or file not xpm");
